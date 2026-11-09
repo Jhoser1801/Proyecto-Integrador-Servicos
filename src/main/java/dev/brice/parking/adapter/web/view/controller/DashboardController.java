@@ -1,8 +1,8 @@
 package dev.brice.parking.adapter.web.view.controller;
 
-import dev.brice.parking.core.constant.SlotStatus;
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.entity.ParkingSlot;
+import dev.brice.parking.core.entity.ParkingTicket;
 import dev.brice.parking.core.port.in.ParkingUseCase;
 import dev.brice.parking.core.port.in.SlotUseCase;
 import org.springframework.stereotype.Controller;
@@ -10,6 +10,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 public class DashboardController {
@@ -21,17 +25,27 @@ public class DashboardController {
         this.parking = parking;
     }
 
-    @GetMapping("/")
-    public String dashboard(Model model) {
-        List<ParkingSlot> allSlots = slots.findAllSlots();
-        model.addAttribute("slots", allSlots);
-        model.addAttribute("freeCars", count(allSlots, VehicleType.CAR));
-        model.addAttribute("freeMotorcycles", count(allSlots, VehicleType.MOTORCYCLE));
-        model.addAttribute("openTickets", parking.findOpenTickets());
-        return "index";
+    // Un cupo junto al ticket abierto que lo ocupa (si lo hay): es lo que dibuja el mapa de cupos
+    public record Bay(ParkingSlot slot, ParkingTicket ticket) {
+        public boolean busy() {
+            return ticket != null;
+        }
     }
 
-    private long count(List<ParkingSlot> allSlots, VehicleType type) {
-        return allSlots.stream().filter(s -> s.vehicleType() == type && s.status() == SlotStatus.FREE).count();
+    @GetMapping("/")
+    public String dashboard(Model model) {
+        Map<UUID, ParkingTicket> openBySlot = parking.findOpenTickets().stream()
+                .collect(Collectors.toMap(ParkingTicket::slotId, Function.identity()));
+        List<Bay> bays = slots.findAllSlots().stream()
+                .map(slot -> new Bay(slot, openBySlot.get(slot.id())))
+                .toList();
+
+        List<Bay> carBays = bays.stream().filter(b -> b.slot().vehicleType() == VehicleType.CAR).toList();
+        List<Bay> motorcycleBays = bays.stream().filter(b -> b.slot().vehicleType() == VehicleType.MOTORCYCLE).toList();
+        model.addAttribute("carBays", carBays);
+        model.addAttribute("motorcycleBays", motorcycleBays);
+        model.addAttribute("freeCars", carBays.stream().filter(b -> !b.busy()).count());
+        model.addAttribute("freeMotorcycles", motorcycleBays.stream().filter(b -> !b.busy()).count());
+        return "index";
     }
 }

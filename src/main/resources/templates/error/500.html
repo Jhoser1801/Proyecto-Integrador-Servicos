@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Algo salió mal')}"></head>
+<head th:replace="~{fragments/layout :: head('Algo falló de nuestro lado')}"></head>
 <body>
-<main class="center">
-    <h1>500</h1>
-    <h2>Algo salió mal</h2>
-    <p>Ocurrió un error inesperado. Intenta de nuevo en un momento.</p>
-    <p th:if="${message}" th:text="${message}"></p>
-    <a class="btn" th:href="@{/}">Volver al inicio</a>
+<main class="center-screen">
+    <div class="sign">
+        <p class="sign-big">500</p>
+        <h1>Algo falló de nuestro lado</h1>
+        <p>No pudimos completar la acción. Intenta de nuevo en un momento.</p>
+        <p th:if="${message}" th:text="${message}"></p>
+        <a class="btn" th:href="@{/}">Volver a los cupos</a>
+    </div>
 </main>
 </body>
 </html>

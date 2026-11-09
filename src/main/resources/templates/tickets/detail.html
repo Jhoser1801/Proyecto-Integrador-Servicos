@@ -2,18 +2,26 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Ticket')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<header th:replace="~{fragments/layout :: nav}"></header>
 <main>
-    <h1>Ticket <span th:text="${ticket.plate}"></span></h1>
-    <div class="card">
-        <p><strong>Tipo:</strong> <span th:text="#{'vehicleType.' + ${ticket.vehicleType}}"></span></p>
-        <p><strong>Cupo:</strong> <span th:text="${slot != null} ? ${slot.code} : '-'"></span></p>
-        <p><strong>Entrada:</strong> <span th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}"></span></p>
-        <p th:if="${ticket.exitAt != null}"><strong>Salida:</strong> <span th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}"></span></p>
-        <p th:if="${ticket.totalAmount != null}"><strong>Total a pagar:</strong> <span th:text="'$' + ${#numbers.formatDecimal(ticket.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span></p>
-        <p><strong>Estado:</strong> <span class="badge" th:classappend="${ticket.status}" th:text="#{'ticketStatus.' + ${ticket.status}}"></span></p>
-        <a class="btn" th:if="${ticket.status.name() == 'CLOSED'}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}">Descargar comprobante PDF</a>
-        <a class="btn secondary" th:href="@{/tickets}">Volver</a>
+    <article class="receipt">
+        <h1 th:text="${ticket.status.name() == 'CLOSED'} ? 'Comprobante de salida' : 'Ticket de entrada'">Comprobante</h1>
+        <dl>
+            <div class="row"><dt>Placa</dt><dd class="plate" th:text="${ticket.plate}"></dd></div>
+            <div class="row"><dt>Vehículo</dt><dd th:text="#{'vehicleType.' + ${ticket.vehicleType}}"></dd></div>
+            <div class="row"><dt>Cupo</dt><dd th:text="${slot != null} ? ${slot.code} : '-'"></dd></div>
+            <div class="row"><dt>Entrada</dt><dd th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}"></dd></div>
+            <div class="row" th:if="${ticket.exitAt != null}"><dt>Salida</dt><dd th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}"></dd></div>
+        </dl>
+        <div class="total" th:if="${ticket.totalAmount != null}">
+            <span>Total a pagar</span>
+            <strong th:text="'$' + ${#numbers.formatDecimal(ticket.totalAmount, 1, 'POINT', 0, 'COMMA')}"></strong>
+        </div>
+        <p th:if="${ticket.status.name() == 'OPEN'}" style="margin:1rem 0 0">El vehículo sigue dentro del parqueadero.</p>
+    </article>
+    <div class="actions">
+        <a class="btn" th:if="${ticket.status.name() == 'CLOSED'}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}">Descargar comprobante en PDF</a>
+        <a class="btn quiet" th:href="@{/tickets}">Volver a tickets</a>
     </div>
 </main>
 </body>

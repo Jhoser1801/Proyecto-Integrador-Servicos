@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Ocurrió un problema')}"></head>
+<head th:replace="~{fragments/layout :: head('No se pudo completar la solicitud')}"></head>
 <body>
-<main class="center">
-    <h1>!</h1>
-    <h2>Ocurrió un problema</h2>
-    <p>No pudimos completar la solicitud.</p>
-    <p th:if="${message}" th:text="${message}"></p>
-    <a class="btn" th:href="@{/}">Volver al inicio</a>
+<main class="center-screen">
+    <div class="sign">
+        <p class="sign-big">!</p>
+        <h1>No se pudo completar la solicitud</h1>
+        <p>Vuelve a intentarlo.</p>
+        <p th:if="${message}" th:text="${message}"></p>
+        <a class="btn" th:href="@{/}">Volver a los cupos</a>
+    </div>
 </main>
 </body>
 </html>
