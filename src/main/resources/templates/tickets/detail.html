@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ticket')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main>
+    <h1>Ticket <span th:text="${ticket.plate}"></span></h1>
+    <div class="card">
+        <p><strong>Tipo:</strong> <span th:text="#{'vehicleType.' + ${ticket.vehicleType}}"></span></p>
+        <p><strong>Cupo:</strong> <span th:text="${slot != null} ? ${slot.code} : '-'"></span></p>
+        <p><strong>Entrada:</strong> <span th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p th:if="${ticket.exitAt != null}"><strong>Salida:</strong> <span th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p th:if="${ticket.totalAmount != null}"><strong>Total a pagar:</strong> <span th:text="'$' + ${#numbers.formatDecimal(ticket.totalAmount, 1, 'POINT', 0, 'COMMA')}"></span></p>
+        <p><strong>Estado:</strong> <span class="badge" th:classappend="${ticket.status}" th:text="#{'ticketStatus.' + ${ticket.status}}"></span></p>
+        <a class="btn" th:if="${ticket.status.name() == 'CLOSED'}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}">Descargar comprobante PDF</a>
+        <a class="btn secondary" th:href="@{/tickets}">Volver</a>
+    </div>
+</main>
+</body>
+</html>

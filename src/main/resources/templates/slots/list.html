@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cupos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main>
+    <h1>Cupos</h1>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+    <div class="card">
+        <h2>Nuevo cupo</h2>
+        <form th:action="@{/slots}" th:object="${form}" method="post">
+            <label for="code">Código</label>
+            <input id="code" th:field="*{code}" maxlength="10" placeholder="A1" required>
+            <label for="vehicleType">Tipo de vehículo</label>
+            <select id="vehicleType" th:field="*{vehicleType}">
+                <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="#{'vehicleType.' + ${t}}"></option>
+            </select>
+            <button type="submit">Crear cupo</button>
+        </form>
+    </div>
+    <div class="card">
+        <div class="table-wrap"><table>
+            <thead><tr><th>Cupo</th><th>Tipo</th><th>Estado</th></tr></thead>
+            <tbody>
+            <tr th:each="s : ${slots}">
+                <td th:text="${s.code}"></td>
+                <td th:text="#{'vehicleType.' + ${s.vehicleType}}"></td>
+                <td><span class="badge" th:classappend="${s.status}" th:text="#{'slotStatus.' + ${s.status}}"></span></td>
+            </tr>
+            </tbody>
+        </table></div>
+    </div>
+</main>
+</body>
+</html>

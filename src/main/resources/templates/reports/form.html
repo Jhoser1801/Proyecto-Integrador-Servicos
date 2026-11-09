@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reportes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main>
+    <h1>Reporte de ingresos</h1>
+    <div class="card">
+        <p>Suma de los cobros de los tickets cerrados en el rango de fechas.</p>
+        <form th:action="@{/reports/revenue.pdf}" method="get">
+            <label for="from">Desde</label>
+            <input id="from" name="from" type="date" th:value="${from}" required>
+            <label for="to">Hasta</label>
+            <input id="to" name="to" type="date" th:value="${to}" required>
+            <button type="submit">Descargar PDF</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

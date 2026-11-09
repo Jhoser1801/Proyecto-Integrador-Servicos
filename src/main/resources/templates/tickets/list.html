@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Tickets')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main>
+    <h1>Tickets</h1>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+    <a class="btn" th:href="@{/tickets/new}">Registrar entrada</a>
+    <div class="card" style="margin-top:1rem">
+        <p th:if="${tickets.isEmpty()}">Todavía no hay tickets.</p>
+        <div class="table-wrap" th:unless="${tickets.isEmpty()}"><table>
+            <thead><tr><th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="t : ${tickets}">
+                <td th:text="${t.plate}"></td>
+                <td th:text="#{'vehicleType.' + ${t.vehicleType}}"></td>
+                <td th:text="${#temporals.format(t.entryAt, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${t.exitAt != null} ? ${#temporals.format(t.exitAt, 'dd/MM/yyyy HH:mm')} : '-'"></td>
+                <td th:text="${t.totalAmount != null} ? '$' + ${#numbers.formatDecimal(t.totalAmount, 1, 'POINT', 0, 'COMMA')} : '-'"></td>
+                <td><span class="badge" th:classappend="${t.status}" th:text="#{'ticketStatus.' + ${t.status}}"></span></td>
+                <td>
+                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" method="post">
+                        <button class="small" type="submit">Registrar salida</button>
+                    </form>
+                    <a class="btn small secondary" th:unless="${t.status.name() == 'OPEN'}" th:href="@{/tickets/{id}(id=${t.id})}">Ver</a>
+                </td>
+            </tr>
+            </tbody>
+        </table></div>
+    </div>
+</main>
+</body>
+</html>

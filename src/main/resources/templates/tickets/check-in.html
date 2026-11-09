@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Registrar entrada')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main>
+    <h1>Registrar entrada</h1>
+    <div class="card">
+        <div th:replace="~{fragments/layout :: messages}"></div>
+        <form th:action="@{/tickets}" th:object="${form}" method="post">
+            <label for="plate">Placa</label>
+            <input id="plate" th:field="*{plate}" maxlength="7" placeholder="ABC123" required style="text-transform:uppercase">
+            <label for="vehicleType">Tipo de vehículo</label>
+            <select id="vehicleType" th:field="*{vehicleType}">
+                <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="#{'vehicleType.' + ${t}}"></option>
+            </select>
+            <button type="submit">Registrar</button>
+            <a class="btn secondary" th:href="@{/tickets}">Cancelar</a>
+        </form>
+    </div>
+</main>
+</body>
+</html>
