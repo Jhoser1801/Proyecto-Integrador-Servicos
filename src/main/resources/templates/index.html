@@ -1,48 +1,68 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Inicio')}"></head>
+<head th:replace="~{fragments/layout :: head('Cupos')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<header th:replace="~{fragments/layout :: nav}"></header>
 <main>
-    <h1>Estado del parqueadero</h1>
-    <div class="grid">
-        <div class="card stat"><strong th:text="${freeCars}">0</strong>Cupos de carro libres</div>
-        <div class="card stat"><strong th:text="${freeMotorcycles}">0</strong>Cupos de moto libres</div>
-        <div class="card stat"><strong th:text="${openTickets.size()}">0</strong>Vehículos dentro</div>
-    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+    <div class="lot">
+        <div>
+            <section class="zone" aria-labelledby="cars-title">
+                <div class="zone-head">
+                    <h2 id="cars-title">Carros</h2>
+                    <p><span th:text="${freeCars}">0</span> libres de <span th:text="${carBays.size()}">0</span></p>
+                </div>
+                <div class="bays">
+                    <div class="bay" th:each="b : ${carBays}" th:classappend="${b.busy} ? 'busy'">
+                        <span class="bay-code" th:text="${b.slot.code}">A1</span>
+                        <th:block th:if="${b.busy}">
+                            <span class="bay-plate" th:text="${b.ticket.plate}">ABC123</span>
+                            <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
+                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" method="post">
+                                <button class="compact" type="submit">Registrar salida</button>
+                            </form>
+                        </th:block>
+                        <span class="bay-state" th:unless="${b.busy}">Libre</span>
+                    </div>
+                </div>
+            </section>
 
-    <div class="card">
-        <h2>Cupos</h2>
-        <div class="table-wrap"><table>
-            <thead><tr><th>Cupo</th><th>Tipo</th><th>Estado</th></tr></thead>
-            <tbody>
-            <tr th:each="s : ${slots}">
-                <td th:text="${s.code}"></td>
-                <td th:text="#{'vehicleType.' + ${s.vehicleType}}"></td>
-                <td><span class="badge" th:classappend="${s.status}" th:text="#{'slotStatus.' + ${s.status}}"></span></td>
-            </tr>
-            </tbody>
-        </table></div>
-    </div>
+            <section class="zone" aria-labelledby="moto-title">
+                <div class="zone-head">
+                    <h2 id="moto-title">Motos</h2>
+                    <p><span th:text="${freeMotorcycles}">0</span> libres de <span th:text="${motorcycleBays.size()}">0</span></p>
+                </div>
+                <div class="bays motorcycle">
+                    <div class="bay" th:each="b : ${motorcycleBays}" th:classappend="${b.busy} ? 'busy'">
+                        <span class="bay-code" th:text="${b.slot.code}">M1</span>
+                        <th:block th:if="${b.busy}">
+                            <span class="bay-plate" th:text="${b.ticket.plate}">MOT45A</span>
+                            <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
+                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" method="post">
+                                <button class="compact" type="submit">Registrar salida</button>
+                            </form>
+                        </th:block>
+                        <span class="bay-state" th:unless="${b.busy}">Libre</span>
+                    </div>
+                </div>
+            </section>
+        </div>
 
-    <div class="card">
-        <h2>Vehículos dentro</h2>
-        <p th:if="${openTickets.isEmpty()}">No hay vehículos dentro.</p>
-        <div class="table-wrap" th:unless="${openTickets.isEmpty()}"><table>
-            <thead><tr><th>Placa</th><th>Tipo</th><th>Entrada</th><th></th></tr></thead>
-            <tbody>
-            <tr th:each="t : ${openTickets}">
-                <td th:text="${t.plate}"></td>
-                <td th:text="#{'vehicleType.' + ${t.vehicleType}}"></td>
-                <td th:text="${#temporals.format(t.entryAt, 'dd/MM/yyyy HH:mm')}"></td>
-                <td>
-                    <form th:action="@{/tickets/{id}/check-out(id=${t.id})}" method="post">
-                        <button class="small" type="submit">Registrar salida</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table></div>
+        <aside class="panel entry" id="entrada" aria-labelledby="entry-title">
+            <h2 id="entry-title">Registrar entrada</h2>
+            <form th:action="@{/tickets}" method="post">
+                <div class="field">
+                    <label for="plate">Placa</label>
+                    <input id="plate" name="plate" maxlength="7" placeholder="ABC123" autocomplete="off" required>
+                </div>
+                <fieldset class="kinds">
+                    <legend>Tipo de vehículo</legend>
+                    <label><input type="radio" name="vehicleType" value="CAR" checked><span>Carro</span></label>
+                    <label><input type="radio" name="vehicleType" value="MOTORCYCLE"><span>Moto</span></label>
+                </fieldset>
+                <button type="submit">Registrar entrada</button>
+            </form>
+        </aside>
     </div>
 </main>
 </body>

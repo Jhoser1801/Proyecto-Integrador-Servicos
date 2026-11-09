@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Petición no válida')}"></head>
+<head th:replace="~{fragments/layout :: head('No se pudo leer la solicitud')}"></head>
 <body>
-<main class="center">
-    <h1>400</h1>
-    <h2>Petición no válida</h2>
-    <p>Hay un dato incorrecto en la solicitud.</p>
-    <p th:if="${message}" th:text="${message}"></p>
-    <a class="btn" th:href="@{/}">Volver al inicio</a>
+<main class="center-screen">
+    <div class="sign">
+        <p class="sign-big">400</p>
+        <h1>No se pudo leer la solicitud</h1>
+        <p>Hay un dato incorrecto.</p>
+        <p th:if="${message}" th:text="${message}"></p>
+        <a class="btn" th:href="@{/}">Volver a los cupos</a>
+    </div>
 </main>
 </body>
 </html>

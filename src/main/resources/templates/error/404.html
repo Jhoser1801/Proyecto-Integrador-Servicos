@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Página no encontrada')}"></head>
+<head th:replace="~{fragments/layout :: head('Esta página no existe')}"></head>
 <body>
-<main class="center">
-    <h1>404</h1>
-    <h2>Página no encontrada</h2>
-    <p>No encontramos lo que buscabas. Revisa la dirección o vuelve al inicio.</p>
-    <p th:if="${message}" th:text="${message}"></p>
-    <a class="btn" th:href="@{/}">Volver al inicio</a>
+<main class="center-screen">
+    <div class="sign">
+        <p class="sign-big">404</p>
+        <h1>Esta página no existe</h1>
+        <p>Revisa la dirección o vuelve a los cupos.</p>
+        <p th:if="${message}" th:text="${message}"></p>
+        <a class="btn" th:href="@{/}">Volver a los cupos</a>
+    </div>
 </main>
 </body>
 </html>

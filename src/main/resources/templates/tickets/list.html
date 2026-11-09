@@ -2,32 +2,34 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Tickets')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<header th:replace="~{fragments/layout :: nav}"></header>
 <main>
-    <h1>Tickets</h1>
+    <div class="toolbar">
+        <h1>Tickets</h1>
+        <a class="btn" th:href="@{/#entrada}">Registrar entrada</a>
+    </div>
     <div th:replace="~{fragments/layout :: messages}"></div>
-    <a class="btn" th:href="@{/tickets/new}">Registrar entrada</a>
-    <div class="card" style="margin-top:1rem">
-        <p th:if="${tickets.isEmpty()}">Todavía no hay tickets.</p>
-        <div class="table-wrap" th:unless="${tickets.isEmpty()}"><table>
-            <thead><tr><th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+    <p class="empty" th:if="${tickets.isEmpty()}">Todavía no hay tickets. Registra la primera entrada desde Cupos.</p>
+    <div class="table-wrap" th:unless="${tickets.isEmpty()}">
+        <table>
+            <thead><tr><th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
             <tbody>
             <tr th:each="t : ${tickets}">
-                <td th:text="${t.plate}"></td>
+                <td class="plate" th:text="${t.plate}"></td>
                 <td th:text="#{'vehicleType.' + ${t.vehicleType}}"></td>
                 <td th:text="${#temporals.format(t.entryAt, 'dd/MM/yyyy HH:mm')}"></td>
-                <td th:text="${t.exitAt != null} ? ${#temporals.format(t.exitAt, 'dd/MM/yyyy HH:mm')} : '-'"></td>
-                <td th:text="${t.totalAmount != null} ? '$' + ${#numbers.formatDecimal(t.totalAmount, 1, 'POINT', 0, 'COMMA')} : '-'"></td>
-                <td><span class="badge" th:classappend="${t.status}" th:text="#{'ticketStatus.' + ${t.status}}"></span></td>
+                <td th:text="${t.exitAt != null} ? ${#temporals.format(t.exitAt, 'dd/MM/yyyy HH:mm')} : 'Sigue dentro'"></td>
+                <td class="num" th:text="${t.totalAmount != null} ? '$' + ${#numbers.formatDecimal(t.totalAmount, 1, 'POINT', 0, 'COMMA')} : '-'"></td>
+                <td><span class="state" th:classappend="${t.status.name() == 'OPEN'} ? 'open'" th:text="#{'ticketStatus.' + ${t.status}}"></span></td>
                 <td>
-                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" method="post">
-                        <button class="small" type="submit">Registrar salida</button>
+                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" method="post" style="margin:0">
+                        <button class="compact" type="submit">Registrar salida</button>
                     </form>
-                    <a class="btn small secondary" th:unless="${t.status.name() == 'OPEN'}" th:href="@{/tickets/{id}(id=${t.id})}">Ver</a>
+                    <a th:unless="${t.status.name() == 'OPEN'}" th:href="@{/tickets/{id}(id=${t.id})}">Ver comprobante</a>
                 </td>
             </tr>
             </tbody>
-        </table></div>
+        </table>
     </div>
 </main>
 </body>

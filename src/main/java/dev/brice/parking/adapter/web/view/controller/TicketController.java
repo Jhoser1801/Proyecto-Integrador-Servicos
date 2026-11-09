@@ -1,7 +1,7 @@
 package dev.brice.parking.adapter.web.view.controller;
 
-import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.CheckInDTO;
+import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
 import dev.brice.parking.core.port.in.ParkingUseCase;
 import dev.brice.parking.core.port.in.ReportUseCase;
@@ -40,24 +40,17 @@ public class TicketController {
         return "tickets/list";
     }
 
-    @GetMapping("/new")
-    public String checkInForm(Model model) {
-        model.addAttribute("form", new CheckInDTO("", VehicleType.CAR));
-        model.addAttribute("vehicleTypes", VehicleType.values());
-        return "tickets/check-in";
-    }
-
+    // El formulario de entrada vive en el inicio (mapa de cupos); aqui solo se recibe y se vuelve a ese inicio
     @PostMapping
-    public String checkIn(@ModelAttribute("form") CheckInDTO form, Model model, RedirectAttributes redirect) {
+    public String checkIn(@ModelAttribute CheckInDTO form, RedirectAttributes redirect) {
         try {
             ParkingTicket ticket = parking.checkIn(form);
-            redirect.addFlashAttribute("success", "Ingreso registrado: " + ticket.plate());
-            return "redirect:/tickets";
+            String slotCode = slots.findSlotById(ticket.slotId()).map(ParkingSlot::code).orElse("-");
+            redirect.addFlashAttribute("success", "Entrada registrada: " + ticket.plate() + " en el cupo " + slotCode);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("vehicleTypes", VehicleType.values());
-            return "tickets/check-in";
+            redirect.addFlashAttribute("error", e.getMessage());
         }
+        return "redirect:/";
     }
 
     @PostMapping("/{id}/check-out")
@@ -67,7 +60,7 @@ public class TicketController {
             return "redirect:/tickets/" + id;
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
-            return "redirect:/tickets";
+            return "redirect:/";
         }
     }
 
