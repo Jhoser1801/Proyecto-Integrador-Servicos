@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ocurrió un problema')}"></head>
+<body>
+<main class="center">
+    <h1>!</h1>
+    <h2>Ocurrió un problema</h2>
+    <p>No pudimos completar la solicitud.</p>
+    <p th:if="${message}" th:text="${message}"></p>
+    <a class="btn" th:href="@{/}">Volver al inicio</a>
+</main>
+</body>
+</html>

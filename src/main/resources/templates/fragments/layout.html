@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · Parqueadero'">Parqueadero</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav class="top" th:fragment="nav">
+    <span class="brand">🅿 Parqueadero</span>
+    <a th:href="@{/}">Inicio</a>
+    <a th:href="@{/tickets}">Tickets</a>
+    <a th:href="@{/tickets/new}">Registrar entrada</a>
+    <a th:href="@{/slots}" sec:authorize="hasRole('ADMIN')">Cupos</a>
+    <a th:href="@{/tariffs}" sec:authorize="hasRole('ADMIN')">Tarifas</a>
+    <a th:href="@{/reports}" sec:authorize="hasRole('ADMIN')">Reportes</a>
+    <span class="spacer"></span>
+    <span sec:authentication="name">usuario</span>
+    <form th:action="@{/logout}" method="post"><button class="small" type="submit">Salir</button></form>
+</nav>
+<div th:fragment="messages">
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>
