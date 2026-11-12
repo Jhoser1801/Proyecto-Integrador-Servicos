@@ -12,7 +12,7 @@
             <thead><tr><th>Vehículo</th><th class="num">Valor por hora</th></tr></thead>
             <tbody>
             <tr th:each="t : ${tariffs}">
-                <td th:text="#{'vehicleType.' + ${t.vehicleType}}"></td>
+                <td th:text="${t.vehicleType.visualName}"></td>
                 <td class="num" th:text="'$' + ${#numbers.formatDecimal(t.hourlyRate, 1, 'POINT', 0, 'COMMA')}"></td>
             </tr>
             </tbody>
@@ -24,7 +24,7 @@
             <div class="field">
                 <label for="vehicleType">Vehículo</label>
                 <select id="vehicleType" th:field="*{vehicleType}">
-                    <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="#{'vehicleType.' + ${t}}"></option>
+                    <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}"></option>
                 </select>
             </div>
             <div class="field">

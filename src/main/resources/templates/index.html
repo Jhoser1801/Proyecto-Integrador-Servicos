@@ -53,7 +53,8 @@
             <form th:action="@{/tickets}" method="post">
                 <div class="field">
                     <label for="plate">Placa</label>
-                    <input id="plate" name="plate" maxlength="7" placeholder="ABC123" autocomplete="off" required>
+                    <input id="plate" name="plate" maxlength="6" placeholder="ABC123" autocomplete="off" aria-describedby="plate-help" required>
+                    <p class="hint" id="plate-help">Carro: 3 letras y 3 números (ABC123).<br>Moto: 3 letras, 2 números y 1 letra (ABC12D).</p>
                 </div>
                 <fieldset class="kinds">
                     <legend>Tipo de vehículo</legend>

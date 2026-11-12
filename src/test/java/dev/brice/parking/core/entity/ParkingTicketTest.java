@@ -34,6 +34,24 @@ class ParkingTicketTest {
     }
 
     @Test
+    void carPlateMustBeThreeLettersAndThreeDigits() {
+        assertDoesNotThrow(() -> ParkingTicket.open(UUID.randomUUID(), "XYZ987", VehicleType.CAR, UUID.randomUUID(), ENTRY));
+        for (String plate : new String[]{"ABC12D", "AB1234", "ABCD12", "ABC1234", "ABC12", "123ABC"}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> ParkingTicket.open(UUID.randomUUID(), plate, VehicleType.CAR, UUID.randomUUID(), ENTRY), plate);
+        }
+    }
+
+    @Test
+    void motorcyclePlateMustBeThreeLettersTwoDigitsAndOneLetter() {
+        assertDoesNotThrow(() -> ParkingTicket.open(UUID.randomUUID(), "mot45a", VehicleType.MOTORCYCLE, UUID.randomUUID(), ENTRY));
+        for (String plate : new String[]{"ABC123", "AB12CD", "ABC1D2", "ABC12", "ABC12DE"}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> ParkingTicket.open(UUID.randomUUID(), plate, VehicleType.MOTORCYCLE, UUID.randomUUID(), ENTRY), plate);
+        }
+    }
+
+    @Test
     void rejectsNullFields() {
         assertThrows(IllegalArgumentException.class,
                 () -> ParkingTicket.open(null, "ABC123", VehicleType.CAR, UUID.randomUUID(), ENTRY));

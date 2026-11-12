@@ -8,7 +8,7 @@
         <h1 th:text="${ticket.status.name() == 'CLOSED'} ? 'Comprobante de salida' : 'Ticket de entrada'">Comprobante</h1>
         <dl>
             <div class="row"><dt>Placa</dt><dd class="plate" th:text="${ticket.plate}"></dd></div>
-            <div class="row"><dt>Vehículo</dt><dd th:text="#{'vehicleType.' + ${ticket.vehicleType}}"></dd></div>
+            <div class="row"><dt>Vehículo</dt><dd th:text="${ticket.vehicleType.visualName}"></dd></div>
             <div class="row"><dt>Cupo</dt><dd th:text="${slot != null} ? ${slot.code} : '-'"></dd></div>
             <div class="row"><dt>Entrada</dt><dd th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}"></dd></div>
             <div class="row" th:if="${ticket.exitAt != null}"><dt>Salida</dt><dd th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}"></dd></div>

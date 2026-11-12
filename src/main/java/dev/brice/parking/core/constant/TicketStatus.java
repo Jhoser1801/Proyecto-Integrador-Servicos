@@ -1,6 +1,16 @@
 package dev.brice.parking.core.constant;
 
 public enum TicketStatus {
-    OPEN,
-    CLOSED
+    OPEN("Dentro"),
+    CLOSED("Cerrado");
+
+    private final String visualName;
+
+    TicketStatus(String visualName) {
+        this.visualName = visualName;
+    }
+
+    public String getVisualName() {
+        return visualName;
+    }
 }
