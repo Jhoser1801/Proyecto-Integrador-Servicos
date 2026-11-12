@@ -65,6 +65,7 @@ input:focus, select:focus { border-color: var(--sign); }
 .bay { position: relative; min-height: 9.5rem; padding: .55rem .65rem .7rem; display: flex; flex-direction: column; gap: .15rem;
        border: 0 solid var(--paint); border-width: 0 5px 5px; margin-bottom: .9rem; }
 .bay-code { font: 700 .95rem var(--font-head); color: var(--muted); }
+.bay-taken { margin-top: auto; font-weight: 600; color: var(--ink); }
 .bay-state { margin-top: auto; font-weight: 600; color: var(--free); }
 .bay.busy { background: var(--busy); }
 .bay.busy .bay-code { color: var(--ink); }
