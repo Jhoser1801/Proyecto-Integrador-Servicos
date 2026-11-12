@@ -14,9 +14,8 @@ src/main/java/dev/brice/parking/
 │   ├── constant/             enums (VehicleType, SlotStatus, TicketStatus, UserRole)
 │   ├── entity/               ParkingSlot, ParkingTicket, Tariff, User (records con validación)
 │   ├── dto/                  datos de entrada/salida de los casos de uso
-│   ├── port/in/              puertos de entrada = casos de uso (interfaces)
-│   ├── port/out/             puertos de salida: repositorios, PasswordHasher, ReportGateway
-│   └── service/              implementan port/in con las reglas de negocio
+│   ├── port/                 puertos (interfaces): repositorios, PasswordHasher, ReportGateway
+│   └── service/              casos de uso con las reglas de negocio (los adapters los usan directo)
 └── adapter/                  BORDE (depende del core, nunca al revés)
     ├── repository/inmemory/  persistencia temporal en memoria
     ├── security/             BCryptPasswordHasher
@@ -60,6 +59,6 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Pendiente
 
-- Persistencia con JDBI: crear `adapter/repository/jdbi/*` implementando los puertos `port/out` y cambiarlos en `Application`.
+- Persistencia con JDBI: crear `adapter/repository/jdbi/*` implementando los puertos de `core/port` y cambiarlos en `Application`.
 - Reporte PDF con OpenPDF: crear `OpenPdfReportGateway implements ReportGateway` y reemplazar `PendingReportGateway`.
   Los botones de descarga ya existen en las vistas.

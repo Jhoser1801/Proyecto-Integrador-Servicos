@@ -2,7 +2,7 @@ package dev.brice.parking.adapter.web.view.controller;
 
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.TariffDTO;
-import dev.brice.parking.core.port.in.TariffUseCase;
+import dev.brice.parking.core.service.TariffService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +16,9 @@ import java.math.BigDecimal;
 @Controller
 @RequestMapping("/tariffs")
 public class TariffController {
-    private final TariffUseCase tariffs;
+    private final TariffService tariffs;
 
-    public TariffController(TariffUseCase tariffs) {
+    public TariffController(TariffService tariffs) {
         this.tariffs = tariffs;
     }
 

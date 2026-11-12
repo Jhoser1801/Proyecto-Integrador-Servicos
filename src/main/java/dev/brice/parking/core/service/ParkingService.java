@@ -4,10 +4,9 @@ import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
 import dev.brice.parking.core.entity.Tariff;
-import dev.brice.parking.core.port.in.ParkingUseCase;
-import dev.brice.parking.core.port.out.SlotRepository;
-import dev.brice.parking.core.port.out.TariffRepository;
-import dev.brice.parking.core.port.out.TicketRepository;
+import dev.brice.parking.core.port.SlotRepository;
+import dev.brice.parking.core.port.TariffRepository;
+import dev.brice.parking.core.port.TicketRepository;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 // Entrada: busca un cupo libre del tipo de vehiculo y lo ocupa. Salida: cobra, cierra el ticket y libera el cupo.
-public class ParkingService implements ParkingUseCase {
+public class ParkingService {
     private final TicketRepository ticketRepository;
     private final SlotRepository slotRepository;
     private final TariffRepository tariffRepository;
@@ -34,7 +33,6 @@ public class ParkingService implements ParkingUseCase {
         this.clock = clock;
     }
 
-    @Override
     public ParkingTicket checkIn(CheckInDTO request) {
         if (request == null || request.vehicleType() == null) {
             throw new IllegalArgumentException("El tipo de vehiculo es obligatorio");
@@ -60,7 +58,6 @@ public class ParkingService implements ParkingUseCase {
         return ticket;
     }
 
-    @Override
     public ParkingTicket checkOut(UUID ticketId) {
         ParkingTicket ticket = ticketRepository.findTicketById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("El ticket no existe"));
@@ -82,19 +79,16 @@ public class ParkingService implements ParkingUseCase {
         return closed;
     }
 
-    @Override
     public Optional<ParkingTicket> findTicketById(UUID ticketId) {
         return ticketRepository.findTicketById(ticketId);
     }
 
-    @Override
     public List<ParkingTicket> findAllTickets() {
         return ticketRepository.findAllTickets().stream()
                 .sorted(Comparator.comparing(ParkingTicket::entryAt).reversed())
                 .toList();
     }
 
-    @Override
     public List<ParkingTicket> findOpenTickets() {
         return findAllTickets().stream().filter(ParkingTicket::isOpen).toList();
     }

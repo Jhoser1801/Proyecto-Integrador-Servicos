@@ -2,7 +2,7 @@ package dev.brice.parking.adapter.repository.inmemory;
 
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.entity.Tariff;
-import dev.brice.parking.core.port.out.TariffRepository;
+import dev.brice.parking.core.port.TariffRepository;
 
 import java.util.List;
 import java.util.Map;

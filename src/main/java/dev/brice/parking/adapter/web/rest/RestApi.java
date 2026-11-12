@@ -10,11 +10,11 @@ import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.dto.SlotDTO;
 import dev.brice.parking.core.dto.TariffDTO;
 import dev.brice.parking.core.entity.User;
-import dev.brice.parking.core.port.in.ParkingUseCase;
-import dev.brice.parking.core.port.in.ReportUseCase;
-import dev.brice.parking.core.port.in.SlotUseCase;
-import dev.brice.parking.core.port.in.TariffUseCase;
-import dev.brice.parking.core.port.in.UserUseCase;
+import dev.brice.parking.core.service.ParkingService;
+import dev.brice.parking.core.service.ReportService;
+import dev.brice.parking.core.service.SlotService;
+import dev.brice.parking.core.service.TariffService;
+import dev.brice.parking.core.service.UserService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -30,19 +30,19 @@ import java.util.UUID;
 public class RestApi {
     private static final String USER_ATTRIBUTE = "user";
 
-    private final ParkingUseCase parking;
-    private final SlotUseCase slots;
-    private final TariffUseCase tariffs;
-    private final ReportUseCase reports;
-    private final UserUseCase users;
+    private final ParkingService parking;
+    private final SlotService slots;
+    private final TariffService tariffs;
+    private final ReportService reports;
+    private final UserService users;
     private final ObjectMapper json = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(MapperFeature.AUTO_DETECT_IS_GETTERS) // no exponer isFree()/isOpen() como campos
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    public RestApi(ParkingUseCase parking, SlotUseCase slots, TariffUseCase tariffs,
-                   ReportUseCase reports, UserUseCase users) {
+    public RestApi(ParkingService parking, SlotService slots, TariffService tariffs,
+                   ReportService reports, UserService users) {
         this.parking = parking;
         this.slots = slots;
         this.tariffs = tariffs;

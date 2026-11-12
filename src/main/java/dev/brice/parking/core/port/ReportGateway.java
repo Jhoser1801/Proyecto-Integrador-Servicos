@@ -1,4 +1,4 @@
-package dev.brice.parking.core.port.out;
+package dev.brice.parking.core.port;
 
 import dev.brice.parking.core.dto.ReceiptDTO;
 import dev.brice.parking.core.dto.ReportDataDTO;
