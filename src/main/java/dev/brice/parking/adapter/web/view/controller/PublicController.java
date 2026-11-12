@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
-// Pagina publica (sin login): solo dice que cupos estan libres. No expone placas ni horas de nadie.
+// Pagina publica (sin login): solo entrega CANTIDADES de cupos libres y totales.
+// A la vista nunca llegan placas, horas, tickets ni los codigos de los cupos.
 @Controller
 public class PublicController {
     private final SlotService slots;
@@ -24,12 +25,19 @@ public class PublicController {
     public String availableSlots(Model model, HttpServletResponse response) {
         response.setHeader("Refresh", "30"); // el navegador recarga la pagina solo
         List<ParkingSlot> all = slots.findAllSlots();
-        List<ParkingSlot> cars = all.stream().filter(s -> s.vehicleType() == VehicleType.CAR).toList();
-        List<ParkingSlot> motorcycles = all.stream().filter(s -> s.vehicleType() == VehicleType.MOTORCYCLE).toList();
-        model.addAttribute("carSlots", cars);
-        model.addAttribute("motorcycleSlots", motorcycles);
-        model.addAttribute("freeCars", cars.stream().filter(s -> s.status() == SlotStatus.FREE).count());
-        model.addAttribute("freeMotorcycles", motorcycles.stream().filter(s -> s.status() == SlotStatus.FREE).count());
+
+        model.addAttribute("freeCars", countFree(all, VehicleType.CAR));
+        model.addAttribute("totalCars", countAll(all, VehicleType.CAR));
+        model.addAttribute("freeMotorcycles", countFree(all, VehicleType.MOTORCYCLE));
+        model.addAttribute("totalMotorcycles", countAll(all, VehicleType.MOTORCYCLE));
         return "public/slots";
+    }
+
+    private long countFree(List<ParkingSlot> all, VehicleType type) {
+        return all.stream().filter(s -> s.vehicleType() == type && s.status() == SlotStatus.FREE).count();
+    }
+
+    private long countAll(List<ParkingSlot> all, VehicleType type) {
+        return all.stream().filter(s -> s.vehicleType() == type).count();
     }
 }

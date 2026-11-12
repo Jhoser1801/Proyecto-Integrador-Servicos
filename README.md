@@ -44,7 +44,7 @@ Usuarios de prueba:
 | `admin`    | `admin123`    | Administrador |
 | `operator` | `operator123` | Operador      |
 
-Cualquier persona, sin iniciar sesión, puede ver qué cupos están libres en `http://localhost:8080/cupos` (no muestra placas).
+Cualquier persona, sin iniciar sesión, puede ver qué cupos están libres en `http://localhost:8080/cupos` (solo la cantidad de cupos libres; no muestra placas, horas ni códigos de cupo).
 
 El operador registra entradas/salidas y ve tickets; el administrador además gestiona cupos, tarifas y reportes.
 
