@@ -26,6 +26,12 @@
         </div>
     </div>
 </header>
+<header class="topbar" th:fragment="publicnav">
+    <div class="topbar-inner">
+        <a class="logo" th:href="@{/cupos}"><span class="logo-p" aria-hidden="true">P</span>Parqueadero</a>
+        <div class="who"><a class="btn quiet compact" style="color:#fff;border-color:#fff" th:href="@{/login}">Ingresar</a></div>
+    </div>
+</header>
 <div th:fragment="messages">
     <div class="notice success" role="status" th:if="${success}" th:text="${success}"></div>
     <div class="notice error" role="alert" th:if="${error}" th:text="${error}"></div>

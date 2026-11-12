@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cupos disponibles')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: publicnav}"></header>
+<main>
+    <h1>Cupos disponibles</h1>
+    <p>Se actualiza solo cada 30 segundos.</p>
+
+    <section class="zone" aria-labelledby="cars-title">
+        <div class="zone-head">
+            <h2 id="cars-title">Carros</h2>
+            <p><span th:text="${freeCars}">0</span> libres de <span th:text="${carSlots.size()}">0</span></p>
+        </div>
+        <div class="bays">
+            <div class="bay" th:each="s : ${carSlots}" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'busy'">
+                <span class="bay-code" th:text="${s.code}">A1</span>
+                <span class="bay-state" th:if="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Libre</span>
+                <span class="bay-taken" th:unless="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Ocupado</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="zone" aria-labelledby="moto-title">
+        <div class="zone-head">
+            <h2 id="moto-title">Motos</h2>
+            <p><span th:text="${freeMotorcycles}">0</span> libres de <span th:text="${motorcycleSlots.size()}">0</span></p>
+        </div>
+        <div class="bays motorcycle">
+            <div class="bay" th:each="s : ${motorcycleSlots}" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'busy'">
+                <span class="bay-code" th:text="${s.code}">M1</span>
+                <span class="bay-state" th:if="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Libre</span>
+                <span class="bay-taken" th:unless="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Ocupado</span>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
