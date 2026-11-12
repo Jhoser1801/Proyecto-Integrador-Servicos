@@ -47,6 +47,10 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8" // evita textos con tildes dañados al compilar en Windows
+}
+
 tasks.test {
     useJUnitPlatform()
 }

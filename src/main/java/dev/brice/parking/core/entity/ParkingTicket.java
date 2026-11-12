@@ -6,7 +6,6 @@ import dev.brice.parking.core.constant.VehicleType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 public record ParkingTicket(
         UUID id,
@@ -18,21 +17,20 @@ public record ParkingTicket(
         BigDecimal totalAmount,
         TicketStatus status
 ) {
-    private static final Pattern PLATE_PATTERN = Pattern.compile("^[A-Z0-9]{5,7}$");
-
     public ParkingTicket {
         if (id == null) {
             throw new IllegalArgumentException("El id del ticket no puede ser nulo");
+        }
+        if (vehicleType == null) {
+            throw new IllegalArgumentException("El tipo de vehiculo no puede ser nulo");
         }
         if (plate == null || plate.isBlank()) {
             throw new IllegalArgumentException("La placa no puede estar vacia");
         }
         plate = plate.trim().toUpperCase();
-        if (!PLATE_PATTERN.matcher(plate).matches()) {
-            throw new IllegalArgumentException("La placa debe tener entre 5 y 7 letras o numeros");
-        }
-        if (vehicleType == null) {
-            throw new IllegalArgumentException("El tipo de vehiculo no puede ser nulo");
+        if (!vehicleType.isValidPlate(plate)) {
+            throw new IllegalArgumentException("La placa " + plate + " no es valida para " + vehicleType.getVisualName().toLowerCase()
+                    + ": debe tener " + vehicleType.getPlateDescription() + " (ejemplo " + vehicleType.getPlateExample() + ")");
         }
         if (slotId == null) {
             throw new IllegalArgumentException("El cupo del ticket no puede ser nulo");
