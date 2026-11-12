@@ -1,4 +1,4 @@
-package dev.brice.parking.core.port.out;
+package dev.brice.parking.core.port;
 
 public interface PasswordHasher {
 

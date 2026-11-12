@@ -6,12 +6,12 @@ import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.dto.SlotDTO;
 import dev.brice.parking.core.dto.TariffDTO;
 import dev.brice.parking.core.dto.UserDTO;
-import dev.brice.parking.core.port.in.SlotUseCase;
-import dev.brice.parking.core.port.in.TariffUseCase;
-import dev.brice.parking.core.port.in.UserUseCase;
-import dev.brice.parking.core.port.out.SlotRepository;
-import dev.brice.parking.core.port.out.TariffRepository;
-import dev.brice.parking.core.port.out.TicketRepository;
+import dev.brice.parking.core.service.SlotService;
+import dev.brice.parking.core.service.TariffService;
+import dev.brice.parking.core.service.UserService;
+import dev.brice.parking.core.port.SlotRepository;
+import dev.brice.parking.core.port.TariffRepository;
+import dev.brice.parking.core.port.TicketRepository;
 import dev.brice.parking.core.service.ParkingService;
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ final class SeedData {
     private SeedData() {
     }
 
-    static void load(UserUseCase users, SlotUseCase slots, TariffUseCase tariffs,
+    static void load(UserService users, SlotService slots, TariffService tariffs,
                      TicketRepository ticketRepository, SlotRepository slotRepository, TariffRepository tariffRepository) {
         users.createUser(new UserDTO("admin", "admin123", UserRole.ADMIN));
         users.createUser(new UserDTO("operator", "operator123", UserRole.OPERATOR));

@@ -3,8 +3,8 @@ package dev.brice.parking.adapter.web.view.controller;
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
-import dev.brice.parking.core.port.in.ParkingUseCase;
-import dev.brice.parking.core.port.in.SlotUseCase;
+import dev.brice.parking.core.service.ParkingService;
+import dev.brice.parking.core.service.SlotService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 @Controller
 public class DashboardController {
-    private final SlotUseCase slots;
-    private final ParkingUseCase parking;
+    private final SlotService slots;
+    private final ParkingService parking;
 
-    public DashboardController(SlotUseCase slots, ParkingUseCase parking) {
+    public DashboardController(SlotService slots, ParkingService parking) {
         this.slots = slots;
         this.parking = parking;
     }

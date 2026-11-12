@@ -1,6 +1,6 @@
 package dev.brice.parking.adapter.security;
 
-import dev.brice.parking.core.port.out.PasswordHasher;
+import dev.brice.parking.core.port.PasswordHasher;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class BCryptPasswordHasher implements PasswordHasher {

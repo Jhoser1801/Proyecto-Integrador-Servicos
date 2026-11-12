@@ -1,8 +1,8 @@
 package dev.brice.parking.adapter.web.view.config;
 
 import dev.brice.parking.core.constant.UserRole;
-import dev.brice.parking.core.port.in.UserUseCase;
-import dev.brice.parking.core.port.out.PasswordHasher;
+import dev.brice.parking.core.service.UserService;
+import dev.brice.parking.core.port.PasswordHasher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,7 +43,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService userDetailsService(UserUseCase users) {
+    UserDetailsService userDetailsService(UserService users) {
         return username -> users.findUserByUsername(username)
                 .map(user -> org.springframework.security.core.userdetails.User.withUsername(user.username())
                         .password(user.passwordHash())

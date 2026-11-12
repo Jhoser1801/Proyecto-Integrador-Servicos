@@ -3,9 +3,9 @@ package dev.brice.parking.adapter.web.view.controller;
 import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
-import dev.brice.parking.core.port.in.ParkingUseCase;
-import dev.brice.parking.core.port.in.ReportUseCase;
-import dev.brice.parking.core.port.in.SlotUseCase;
+import dev.brice.parking.core.service.ParkingService;
+import dev.brice.parking.core.service.ReportService;
+import dev.brice.parking.core.service.SlotService;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,11 +24,11 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/tickets")
 public class TicketController {
-    private final ParkingUseCase parking;
-    private final SlotUseCase slots;
-    private final ReportUseCase reports;
+    private final ParkingService parking;
+    private final SlotService slots;
+    private final ReportService reports;
 
-    public TicketController(ParkingUseCase parking, SlotUseCase slots, ReportUseCase reports) {
+    public TicketController(ParkingService parking, SlotService slots, ReportService reports) {
         this.parking = parking;
         this.slots = slots;
         this.reports = reports;

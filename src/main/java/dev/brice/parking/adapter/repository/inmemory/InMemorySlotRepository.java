@@ -2,7 +2,7 @@ package dev.brice.parking.adapter.repository.inmemory;
 
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.entity.ParkingSlot;
-import dev.brice.parking.core.port.out.SlotRepository;
+import dev.brice.parking.core.port.SlotRepository;
 
 import java.util.List;
 import java.util.Map;

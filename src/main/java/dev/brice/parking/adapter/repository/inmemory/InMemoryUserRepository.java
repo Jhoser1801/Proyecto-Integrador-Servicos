@@ -1,7 +1,7 @@
 package dev.brice.parking.adapter.repository.inmemory;
 
 import dev.brice.parking.core.entity.User;
-import dev.brice.parking.core.port.out.UserRepository;
+import dev.brice.parking.core.port.UserRepository;
 
 import java.util.List;
 import java.util.Map;

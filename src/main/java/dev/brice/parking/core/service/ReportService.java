@@ -4,10 +4,9 @@ import dev.brice.parking.core.dto.ReceiptDTO;
 import dev.brice.parking.core.dto.ReportDataDTO;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
-import dev.brice.parking.core.port.in.ReportUseCase;
-import dev.brice.parking.core.port.out.ReportGateway;
-import dev.brice.parking.core.port.out.SlotRepository;
-import dev.brice.parking.core.port.out.TicketRepository;
+import dev.brice.parking.core.port.ReportGateway;
+import dev.brice.parking.core.port.SlotRepository;
+import dev.brice.parking.core.port.TicketRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,7 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class ReportService implements ReportUseCase {
+public class ReportService {
     private final TicketRepository ticketRepository;
     private final SlotRepository slotRepository;
     private final ReportGateway gateway;
@@ -26,7 +25,6 @@ public class ReportService implements ReportUseCase {
         this.gateway = gateway;
     }
 
-    @Override
     public byte[] generateRevenueReport(LocalDate from, LocalDate to) {
         if (from == null || to == null) {
             throw new IllegalArgumentException("Las fechas del reporte son obligatorias");
@@ -44,7 +42,6 @@ public class ReportService implements ReportUseCase {
         return gateway.generateRevenueReport(new ReportDataDTO("Reporte de ingresos", from, to, tickets, total));
     }
 
-    @Override
     public byte[] generateReceipt(UUID ticketId) {
         ParkingTicket ticket = ticketRepository.findTicketById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("El ticket no existe"));

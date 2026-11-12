@@ -1,6 +1,6 @@
 package dev.brice.parking.adapter.web.view.controller;
 
-import dev.brice.parking.core.port.in.ReportUseCase;
+import dev.brice.parking.core.service.ReportService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -17,9 +17,9 @@ import java.time.LocalDate;
 @Controller
 @RequestMapping("/reports")
 public class ReportController {
-    private final ReportUseCase reports;
+    private final ReportService reports;
 
-    public ReportController(ReportUseCase reports) {
+    public ReportController(ReportService reports) {
         this.reports = reports;
     }
 

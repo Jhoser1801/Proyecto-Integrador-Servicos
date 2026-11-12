@@ -1,7 +1,7 @@
 package dev.brice.parking.adapter.repository.inmemory;
 
 import dev.brice.parking.core.entity.ParkingTicket;
-import dev.brice.parking.core.port.out.TicketRepository;
+import dev.brice.parking.core.port.TicketRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -2,14 +2,13 @@ package dev.brice.parking.core.service;
 
 import dev.brice.parking.core.dto.UserDTO;
 import dev.brice.parking.core.entity.User;
-import dev.brice.parking.core.port.in.UserUseCase;
-import dev.brice.parking.core.port.out.PasswordHasher;
-import dev.brice.parking.core.port.out.UserRepository;
+import dev.brice.parking.core.port.PasswordHasher;
+import dev.brice.parking.core.port.UserRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserService implements UserUseCase {
+public class UserService {
     private static final int MIN_PASSWORD_LENGTH = 6;
 
     private final UserRepository repository;
@@ -20,7 +19,6 @@ public class UserService implements UserUseCase {
         this.passwordHasher = passwordHasher;
     }
 
-    @Override
     public User createUser(UserDTO request) {
         if (request.password() == null || request.password().length() < MIN_PASSWORD_LENGTH) {
             throw new IllegalArgumentException("La contrasena debe tener minimo " + MIN_PASSWORD_LENGTH + " caracteres");
@@ -33,7 +31,6 @@ public class UserService implements UserUseCase {
         return user;
     }
 
-    @Override
     public Optional<User> authenticate(String username, String password) {
         if (username == null || password == null) {
             return Optional.empty();
@@ -42,7 +39,6 @@ public class UserService implements UserUseCase {
                 .filter(user -> passwordHasher.matches(password, user.passwordHash()));
     }
 
-    @Override
     public Optional<User> findUserByUsername(String username) {
         return repository.findUserByUsername(username);
     }
