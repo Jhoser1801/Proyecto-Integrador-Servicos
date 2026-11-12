@@ -6,34 +6,24 @@
 <main>
     <h1>Cupos disponibles</h1>
     <p>Se actualiza solo cada 30 segundos.</p>
-
-    <section class="zone" aria-labelledby="cars-title">
-        <div class="zone-head">
+    <div class="avail">
+        <section class="panel" aria-labelledby="cars-title">
             <h2 id="cars-title">Carros</h2>
-            <p><span th:text="${freeCars}">0</span> libres de <span th:text="${carSlots.size()}">0</span></p>
-        </div>
-        <div class="bays">
-            <div class="bay" th:each="s : ${carSlots}" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'busy'">
-                <span class="bay-code" th:text="${s.code}">A1</span>
-                <span class="bay-state" th:if="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Libre</span>
-                <span class="bay-taken" th:unless="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Ocupado</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="zone" aria-labelledby="moto-title">
-        <div class="zone-head">
+            <p class="avail-count" th:classappend="${freeCars == 0} ? 'none'">
+                <strong th:text="${freeCars}">0</strong>
+                <span th:text="${freeCars == 1} ? 'cupo libre' : 'cupos libres'">cupos libres</span>
+            </p>
+            <p class="hint" th:text="${freeCars == 0} ? 'Por ahora no hay cupos libres para carros.' : 'De ' + ${totalCars} + ' cupos para carros.'"></p>
+        </section>
+        <section class="panel" aria-labelledby="moto-title">
             <h2 id="moto-title">Motos</h2>
-            <p><span th:text="${freeMotorcycles}">0</span> libres de <span th:text="${motorcycleSlots.size()}">0</span></p>
-        </div>
-        <div class="bays motorcycle">
-            <div class="bay" th:each="s : ${motorcycleSlots}" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'busy'">
-                <span class="bay-code" th:text="${s.code}">M1</span>
-                <span class="bay-state" th:if="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Libre</span>
-                <span class="bay-taken" th:unless="${s.status.name() == 'FREE'}" th:text="${s.status.visualName}">Ocupado</span>
-            </div>
-        </div>
-    </section>
+            <p class="avail-count" th:classappend="${freeMotorcycles == 0} ? 'none'">
+                <strong th:text="${freeMotorcycles}">0</strong>
+                <span th:text="${freeMotorcycles == 1} ? 'cupo libre' : 'cupos libres'">cupos libres</span>
+            </p>
+            <p class="hint" th:text="${freeMotorcycles == 0} ? 'Por ahora no hay cupos libres para motos.' : 'De ' + ${totalMotorcycles} + ' cupos para motos.'"></p>
+        </section>
+    </div>
 </main>
 </body>
 </html>
