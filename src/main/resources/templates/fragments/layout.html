@@ -18,7 +18,6 @@
             <a th:href="@{/tickets}">Tickets</a>
             <a th:href="@{/tariffs}" sec:authorize="hasRole('ADMIN')">Tarifas</a>
             <a th:href="@{/slots}" sec:authorize="hasRole('ADMIN')">Administrar cupos</a>
-            <a th:href="@{/reports}" sec:authorize="hasRole('ADMIN')">Reportes</a>
         </nav>
         <div class="who">
             <span><span sec:authentication="name">usuario</span></span>

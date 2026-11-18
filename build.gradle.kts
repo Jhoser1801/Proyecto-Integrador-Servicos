@@ -40,9 +40,6 @@ dependencies {
     // implementation("org.jdbi:jdbi3-core:3.55.0")
     // implementation("org.jdbi:jdbi3-sqlobject:3.55.0")
 
-    // reportes PDF: pendiente
-    // implementation("com.github.librepdf:openpdf:3.0.5")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
