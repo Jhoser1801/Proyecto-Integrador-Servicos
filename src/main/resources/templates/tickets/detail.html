@@ -20,6 +20,7 @@
         <p th:if="${ticket.status.name() == 'OPEN'}" style="margin:1rem 0 0">El vehículo sigue dentro del parqueadero.</p>
     </article>
     <div class="actions">
+        <a class="btn" th:if="${ticket.status.name() == 'CLOSED'}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}">Descargar comprobante en PDF</a>
         <a class="btn quiet" th:href="@{/tickets}">Volver a tickets</a>
     </div>
 </main>

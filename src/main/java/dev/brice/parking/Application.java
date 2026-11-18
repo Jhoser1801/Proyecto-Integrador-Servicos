@@ -8,6 +8,7 @@ import dev.brice.parking.adapter.security.BCryptPasswordHasher;
 import dev.brice.parking.adapter.web.rest.RestApi;
 import dev.brice.parking.adapter.web.view.ViewApplication;
 import dev.brice.parking.core.service.ParkingService;
+import dev.brice.parking.core.service.ReportService;
 import dev.brice.parking.core.service.SlotService;
 import dev.brice.parking.core.service.TariffService;
 import dev.brice.parking.core.service.UserService;
@@ -38,12 +39,13 @@ public class Application {
         UserService userService = new UserService(userRepository, passwordHasher);
         SlotService slotService = new SlotService(slotRepository);
         TariffService tariffService = new TariffService(tariffRepository);
+        ReportService reportService = new ReportService(ticketRepository, slotRepository);
         ParkingService parkingService = new ParkingService(ticketRepository, slotRepository, tariffRepository, clock);
 
         SeedData.load(userService, slotService, tariffService, ticketRepository, slotRepository, tariffRepository);
 
         // Adaptadores de entrada: REST (Javalin) y vistas (Spring + Thymeleaf)
-        new RestApi(parkingService, slotService, tariffService, userService).start(REST_PORT);
+        new RestApi(parkingService, slotService, tariffService, reportService, userService).start(REST_PORT);
 
         SpringApplication views = new SpringApplication(ViewApplication.class);
         views.addInitializers(context -> {
@@ -52,6 +54,7 @@ public class Application {
             beans.registerSingleton("slotService", slotService);
             beans.registerSingleton("tariffService", tariffService);
             beans.registerSingleton("parkingService", parkingService);
+            beans.registerSingleton("reportService", reportService);
             beans.registerSingleton("passwordHasher", passwordHasher);
         });
         views.run(args);

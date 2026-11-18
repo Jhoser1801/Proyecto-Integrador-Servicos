@@ -11,6 +11,7 @@ import dev.brice.parking.core.dto.SlotDTO;
 import dev.brice.parking.core.dto.TariffDTO;
 import dev.brice.parking.core.entity.User;
 import dev.brice.parking.core.service.ParkingService;
+import dev.brice.parking.core.service.ReportService;
 import dev.brice.parking.core.service.SlotService;
 import dev.brice.parking.core.service.TariffService;
 import dev.brice.parking.core.service.UserService;
@@ -20,6 +21,7 @@ import io.javalin.http.HttpStatus;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.http.ForbiddenResponse;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class RestApi {
     private final ParkingService parking;
     private final SlotService slots;
     private final TariffService tariffs;
+    private final ReportService reports;
     private final UserService users;
     private final ObjectMapper json = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -39,10 +42,11 @@ public class RestApi {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     public RestApi(ParkingService parking, SlotService slots, TariffService tariffs,
-                   UserService users) {
+                   ReportService reports, UserService users) {
         this.parking = parking;
         this.slots = slots;
         this.tariffs = tariffs;
+        this.reports = reports;
         this.users = users;
     }
 
@@ -73,6 +77,12 @@ public class RestApi {
             });
             config.routes.post("/api/tickets/{id}/check-out", ctx -> respond(ctx, parking.checkOut(id(ctx))));
 
+
+            config.routes.get("/api/tickets/{id}/receipt", ctx -> respond(ctx, reports.buildReceipt(id(ctx))));
+            config.routes.get("/api/reports/revenue", ctx -> {
+                requireAdmin(ctx);
+                respond(ctx, reports.buildRevenueReport(date(ctx, "from"), date(ctx, "to")));
+            });
 
             config.routes.exception(IllegalArgumentException.class, (e, ctx) -> error(ctx, HttpStatus.BAD_REQUEST, e.getMessage()));
             config.routes.exception(com.fasterxml.jackson.core.JsonProcessingException.class,
@@ -127,4 +137,12 @@ public class RestApi {
         }
     }
 
+    private LocalDate date(Context ctx, String name) {
+        String value = ctx.queryParam(name);
+        try {
+            return value == null ? null : LocalDate.parse(value);
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new IllegalArgumentException("La fecha '" + name + "' debe tener formato yyyy-MM-dd");
+        }
+    }
 }
