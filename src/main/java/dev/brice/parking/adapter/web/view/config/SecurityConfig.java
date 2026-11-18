@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/error", "/error/**", "/cupos").permitAll()
-                        .requestMatchers("/slots/**", "/tariffs/**").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/slots/**", "/tariffs/**", "/reports/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());

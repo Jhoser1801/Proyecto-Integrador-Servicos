@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
@@ -66,5 +67,11 @@ public class TicketController {
         model.addAttribute("ticket", ticket);
         model.addAttribute("slot", slots.findSlotById(ticket.slotId()).orElse(null));
         return "tickets/detail";
+    }
+
+    // El comprobante en PDF todavia no se genera: se muestra la pagina de "funcion no disponible"
+    @GetMapping("/{id}/receipt.pdf")
+    public ModelAndView receipt(@PathVariable UUID id) {
+        return new ModelAndView("error/unavailable", HttpStatus.NOT_IMPLEMENTED);
     }
 }
