@@ -1,12 +1,6 @@
 package dev.brice.parking.core.port;
 
-import dev.brice.parking.core.dto.ReceiptDTO;
-import dev.brice.parking.core.dto.ReportDataDTO;
-
-// Los dos devuelven el PDF ya armado (bytes) para que cualquier adapter web lo pueda descargar
+// Puerto reservado para reportes (PDF). Todavia no se usa: se llenara cuando se implemente.
 public interface ReportGateway {
-
-    byte[] generateRevenueReport(ReportDataDTO data);
-    byte[] generateReceipt(ReceiptDTO data);
 
 }

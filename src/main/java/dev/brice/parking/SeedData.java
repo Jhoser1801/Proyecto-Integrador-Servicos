@@ -19,7 +19,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-// Datos de prueba: usuarios, cupos, tarifas y algunos tickets historicos para que el reporte tenga datos.
+// Datos de prueba: usuarios, cupos, tarifas y algunos tickets historicos.
 final class SeedData {
     private SeedData() {
     }
