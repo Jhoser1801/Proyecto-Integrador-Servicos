@@ -1,4 +1,4 @@
-package dev.brice.parking.adapter.web.view.config;
+package dev.brice.parking.adapter.ui.spring.config;
 
 import dev.brice.parking.core.constant.UserRole;
 import dev.brice.parking.core.service.UserService;

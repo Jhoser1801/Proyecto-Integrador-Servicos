@@ -19,9 +19,9 @@ src/main/java/dev/brice/parking/
 └── adapter/                  BORDE (depende del core, nunca al revés)
     ├── repository/inmemory/  persistencia temporal en memoria
     ├── security/             BCryptPasswordHasher
-    └── web/
-        ├── rest/             API REST con Javalin
-        └── view/             vistas con Spring + Thymeleaf + Spring Security
+    └── ui/
+        ├── javalin/          JavalinUI: API REST con Javalin
+        └── spring/           SpringUI + SpringConfig + controller/: vistas con Spring + Thymeleaf + login
 ```
 
 Reglas de negocio principales (en `core`): un vehículo no puede entrar dos veces, un cupo ocupado no se

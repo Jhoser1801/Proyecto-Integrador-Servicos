@@ -1,4 +1,4 @@
-package dev.brice.parking.adapter.web.view.controller;
+package dev.brice.parking.adapter.ui.spring.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

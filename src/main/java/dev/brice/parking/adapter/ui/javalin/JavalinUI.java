@@ -1,4 +1,4 @@
-package dev.brice.parking.adapter.web.rest;
+package dev.brice.parking.adapter.ui.javalin;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -25,9 +25,9 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
-// Adaptador de entrada REST (Javalin). Solo traduce HTTP <-> casos de uso; las reglas viven en core.
+// Adaptador de interfaz REST (Javalin). Solo traduce HTTP <-> casos de uso; las reglas viven en core.
 // Autenticacion: HTTP Basic con los mismos usuarios de las vistas.
-public class RestApi {
+public class JavalinUI {
     private static final String USER_ATTRIBUTE = "user";
 
     private final ParkingService parking;
@@ -41,7 +41,7 @@ public class RestApi {
             .disable(MapperFeature.AUTO_DETECT_IS_GETTERS) // no exponer isFree()/isOpen() como campos
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    public RestApi(ParkingService parking, SlotService slots, TariffService tariffs,
+    public JavalinUI(ParkingService parking, SlotService slots, TariffService tariffs,
                    ReportService reports, UserService users) {
         this.parking = parking;
         this.slots = slots;
@@ -50,7 +50,7 @@ public class RestApi {
         this.users = users;
     }
 
-    public Javalin start(int port) {
+    public Javalin runServer(int port) {
         return Javalin.create(config -> {
             config.routes.before("/api/*", this::authenticate);
 
