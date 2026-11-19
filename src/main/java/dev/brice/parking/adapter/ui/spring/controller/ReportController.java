@@ -1,4 +1,4 @@
-package dev.brice.parking.adapter.web.view.controller;
+package dev.brice.parking.adapter.ui.spring.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

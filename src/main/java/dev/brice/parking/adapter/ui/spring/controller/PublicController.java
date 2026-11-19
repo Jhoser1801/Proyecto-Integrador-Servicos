@@ -1,4 +1,4 @@
-package dev.brice.parking.adapter.web.view.controller;
+package dev.brice.parking.adapter.ui.spring.controller;
 
 import dev.brice.parking.core.constant.SlotStatus;
 import dev.brice.parking.core.constant.VehicleType;
