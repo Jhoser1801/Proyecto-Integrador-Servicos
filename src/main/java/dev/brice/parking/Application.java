@@ -1,9 +1,9 @@
 package dev.brice.parking;
 
-import dev.brice.parking.adapter.repository.inmemory.InMemorySlotRepository;
-import dev.brice.parking.adapter.repository.inmemory.InMemoryTariffRepository;
-import dev.brice.parking.adapter.repository.inmemory.InMemoryTicketRepository;
-import dev.brice.parking.adapter.repository.inmemory.InMemoryUserRepository;
+import dev.brice.parking.adapter.repository.h2.H2SlotRepository;
+import dev.brice.parking.adapter.repository.h2.H2TariffRepository;
+import dev.brice.parking.adapter.repository.h2.H2TicketRepository;
+import dev.brice.parking.adapter.repository.h2.H2UserRepository;
 import dev.brice.parking.adapter.security.BCryptPasswordHasher;
 import dev.brice.parking.adapter.ui.javalin.JavalinUI;
 import dev.brice.parking.adapter.ui.spring.SpringUI;
@@ -18,6 +18,9 @@ import dev.brice.parking.core.port.TariffRepository;
 import dev.brice.parking.core.port.TicketRepository;
 import dev.brice.parking.core.port.UserRepository;
 
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+
 import java.time.Clock;
 
 // Raiz de composicion: aqui (y solo aqui) se eligen los adapters y se conectan con el core.
@@ -27,11 +30,16 @@ public class Application {
     public static void main(String[] args) {
         Clock clock = Clock.systemDefaultZone();
 
-        // Adaptadores de salida. Persistencia en memoria por ahora; luego se cambia por JDBI en estas lineas.
-        SlotRepository slotRepository = new InMemorySlotRepository();
-        TicketRepository ticketRepository = new InMemoryTicketRepository();
-        TariffRepository tariffRepository = new InMemoryTariffRepository();
-        UserRepository userRepository = new InMemoryUserRepository();
+        // Base de datos H2 en memoria (se crea vacia en cada arranque)
+        Jdbi jdbi = Jdbi.create("jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1", "sa", "");
+        jdbi.installPlugin(new SqlObjectPlugin());
+
+        // Adaptadores de salida (puertos). El orden importa: ticket tiene llave foranea a cupo.
+        // Para volver a memoria: new InMemory...Repository() en lugar de new H2...Repository(jdbi)
+        UserRepository userRepository = new H2UserRepository(jdbi);
+        SlotRepository slotRepository = new H2SlotRepository(jdbi);
+        TariffRepository tariffRepository = new H2TariffRepository(jdbi);
+        TicketRepository ticketRepository = new H2TicketRepository(jdbi);
         PasswordHasher passwordHasher = new BCryptPasswordHasher();
 
         // Casos de uso (services del core)

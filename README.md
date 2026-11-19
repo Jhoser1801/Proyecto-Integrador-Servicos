@@ -17,7 +17,8 @@ src/main/java/dev/brice/parking/
 │   ├── port/                 puertos (interfaces): repositorios, PasswordHasher (ReportGateway reservado, vacío)
 │   └── service/              casos de uso con las reglas de negocio (los adapters los usan directo)
 └── adapter/                  BORDE (depende del core, nunca al revés)
-    ├── repository/inmemory/  persistencia temporal en memoria
+    ├── repository/h2/        persistencia con JDBI + H2 (H2XRepository + dao/)
+    ├── repository/inmemory/  persistencia en memoria (alternativa, sirve para pruebas)
     ├── security/             BCryptPasswordHasher
     └── ui/
         ├── javalin/          JavalinUI: API REST con Javalin
@@ -59,7 +60,11 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 | GET | `/api/tickets/{id}/receipt` (JSON, ticket cerrado) | cualquiera |
 | GET | `/api/reports/revenue?from=yyyy-MM-dd&to=yyyy-MM-dd` (JSON) | ADMIN |
 
+## Base de datos
+
+H2 en memoria con JDBI (`jdbc:h2:mem:parkingdb`, usuario `sa`, sin clave). Las tablas se crean solas al arrancar (`setupTables()` de cada repositorio) y los datos de prueba se cargan en `SeedData`. Al ser una base en memoria, los datos se pierden al cerrar la aplicación.
+Para usar memoria pura se cambian los `new H2...Repository(jdbi)` por `new InMemory...Repository()` en `Application`.
+
 ## Pendiente
 
 - Reportes en PDF: `ReportService` ya arma los datos (`ReportDataDTO`, `ReceiptDTO`); falta el adaptador que los convierta en PDF a través de `ReportGateway`. Mientras tanto las vistas muestran "función no disponible".
-- Persistencia con JDBI: crear `adapter/repository/jdbi/*` implementando los puertos de `core/port` y cambiarlos en `Application`.

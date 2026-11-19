@@ -36,9 +36,10 @@ dependencies {
 
     implementation("org.mindrot:jbcrypt:0.4") // hash de contraseñas
 
-    // base de datos: pendiente (JDBI + la BD que asigne el docente)
-    // implementation("org.jdbi:jdbi3-core:3.55.0")
-    // implementation("org.jdbi:jdbi3-sqlobject:3.55.0")
+    // persistencia: JDBI + H2
+    implementation("org.jdbi:jdbi3-core:3.55.0")      //jdbi
+    implementation("org.jdbi:jdbi3-sqlobject:3.55.0") //jdbi
+    runtimeOnly("com.h2database:h2")                  //h2
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
