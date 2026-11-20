@@ -1,0 +1,13 @@
+services:
+  parking:
+    build: .
+    container_name: parking
+    ports:
+      - "8080:8080"   # vistas (navegador)
+      - "7070:7070"   # API REST
+    volumes:
+      - parking-data:/app/data   # aqui vive la base H2 (data/parking.mv.db)
+    restart: unless-stopped
+
+volumes:
+  parking-data:
