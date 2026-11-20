@@ -17,7 +17,7 @@ src/main/java/dev/brice/parking/
 │   ├── port/                 puertos (interfaces): repositorios, PasswordHasher (ReportGateway reservado, vacío)
 │   └── service/              casos de uso con las reglas de negocio (los adapters los usan directo)
 └── adapter/                  BORDE (depende del core, nunca al revés)
-    ├── repository/h2/        persistencia con JDBI + H2 (H2XRepository + dao/)
+    ├── repository/h2/        persistencia con JDBI + H2 en archivo (H2XRepository + dao/)
     ├── repository/inmemory/  persistencia en memoria (alternativa, sirve para pruebas)
     ├── security/             BCryptPasswordHasher
     └── ui/
@@ -62,8 +62,13 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Base de datos
 
-H2 en memoria con JDBI (`jdbc:h2:mem:parkingdb`, usuario `sa`, sin clave). Las tablas se crean solas al arrancar (`setupTables()` de cada repositorio) y los datos de prueba se cargan en `SeedData`. Al ser una base en memoria, los datos se pierden al cerrar la aplicación.
-Para usar memoria pura se cambian los `new H2...Repository(jdbi)` por `new InMemory...Repository()` en `Application`.
+H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`, sin clave). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `SeedData` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `SeedData` no se repite.
+
+- **Empezar de cero:** cerrar la aplicación y borrar la carpeta `data/`.
+- **Una sola aplicación a la vez:** no se debe ejecutar dos copias con la misma carpeta `data/` (los puertos 8080 y 7070 tampoco lo permiten).
+- **Dónde queda `data/`:** en la carpeta desde la que se ejecuta el proyecto. Con `gradlew bootRun` o con el botón verde de IntelliJ es la carpeta raíz del proyecto.
+- **Base temporal en memoria:** cambiar `DB_URL` en `Application` por `jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1`.
+- **Sin base de datos:** cambiar los `new H2...Repository(jdbi)` por `new InMemory...Repository()`.
 
 ## Pendiente
 

@@ -26,12 +26,14 @@ import java.time.Clock;
 // Raiz de composicion: aqui (y solo aqui) se eligen los adapters y se conectan con el core.
 public class Application {
     private static final int REST_PORT = 7070;
+    private static final String DB_URL = "jdbc:h2:file:./data/parking";
 
     public static void main(String[] args) {
         Clock clock = Clock.systemDefaultZone();
 
-        // Base de datos H2 en memoria (se crea vacia en cada arranque)
-        Jdbi jdbi = Jdbi.create("jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1", "sa", "");
+        // Base de datos H2 en un archivo (carpeta data/ del proyecto): los datos se conservan entre arranques.
+        // Para una base temporal en memoria: "jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1"
+        Jdbi jdbi = Jdbi.create(DB_URL, "sa", "");
         jdbi.installPlugin(new SqlObjectPlugin());
 
         // Adaptadores de salida (puertos). El orden importa: ticket tiene llave foranea a cupo.
@@ -49,7 +51,10 @@ public class Application {
         ReportService reportService = new ReportService(ticketRepository, slotRepository);
         ParkingService parkingService = new ParkingService(ticketRepository, slotRepository, tariffRepository, clock);
 
-        SeedData.load(userService, slotService, tariffService, ticketRepository, slotRepository, tariffRepository);
+        // datos de prueba: solo la primera vez, cuando la base esta vacia
+        if (userRepository.findAllUsers().isEmpty()) {
+            SeedData.load(userService, slotService, tariffService, ticketRepository, slotRepository, tariffRepository);
+        }
 
         // Adaptadores de interfaz: REST (Javalin) y vistas (Spring + Thymeleaf)
         JavalinUI javalinUI = new JavalinUI(parkingService, slotService, tariffService, reportService, userService);
