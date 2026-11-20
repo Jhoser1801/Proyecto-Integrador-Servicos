@@ -60,6 +60,21 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 | GET | `/api/tickets/{id}/receipt` (JSON, ticket cerrado) | cualquiera |
 | GET | `/api/reports/revenue?from=yyyy-MM-dd&to=yyyy-MM-dd` (JSON) | ADMIN |
 
+## Docker
+
+Requiere Docker Desktop encendido (en Windows, con WSL2).
+
+```bash
+docker compose up --build     # la primera vez compila el proyecto dentro de Docker; tarda unos minutos
+docker compose up             # las siguientes veces
+docker compose down           # detener (los datos se conservan)
+docker compose down -v        # detener y BORRAR la base de datos (empezar de cero)
+```
+
+- Vistas: http://localhost:8080 · REST: http://localhost:7070/api
+- La base H2 vive en el volumen `parking-data` (dentro del contenedor, en `/app/data/parking.mv.db`), así que los datos sobreviven aunque el contenedor se borre o se reconstruya.
+- Docker no reemplaza a H2: H2 sigue corriendo dentro de la aplicación; Docker solo empaqueta la aplicación y guarda su carpeta `data/`.
+
 ## Base de datos
 
 H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`, sin clave). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `SeedData` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `SeedData` no se repite.
