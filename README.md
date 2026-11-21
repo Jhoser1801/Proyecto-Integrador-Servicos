@@ -62,17 +62,18 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Docker
 
-Requiere Docker Desktop encendido (en Windows, con WSL2).
+El proyecto no incluye archivos de Docker: se usa la imagen ya publicada en Docker Hub (requiere Docker Desktop encendido).
 
 ```bash
-docker compose up --build     # la primera vez compila el proyecto dentro de Docker; tarda unos minutos
-docker compose up             # las siguientes veces
-docker compose down           # detener (los datos se conservan)
-docker compose down -v        # detener y BORRAR la base de datos (empezar de cero)
+docker run -d --name parking -p 8080:8080 -p 7070:7070 -v parking-data:/app/data TU_USUARIO/parking-integrator:1.0
 ```
 
-- Vistas: http://localhost:8080 · REST: http://localhost:7070/api
-- La base H2 vive en el volumen `parking-data` (dentro del contenedor, en `/app/data/parking.mv.db`), así que los datos sobreviven aunque el contenedor se borre o se reconstruya.
+- Imagen: https://hub.docker.com/r/TU_USUARIO/parking-integrator
+- Vistas: http://localhost:8080 · REST: http://localhost:7070/api · usuarios: `admin` / `admin123` y `operator` / `operator123`
+- La base de datos es **H2 en archivo**, y vive dentro del contenedor en `/app/data/parking.mv.db`. El volumen `parking-data` hace que los datos se conserven aunque el contenedor se detenga o se borre.
+- Detener: `docker stop parking` · volver a iniciar: `docker start parking`
+- Borrar el contenedor: `docker rm -f parking` (los datos siguen en el volumen)
+- Empezar de cero con la base vacía: `docker rm -f parking` y `docker volume rm parking-data`
 - Docker no reemplaza a H2: H2 sigue corriendo dentro de la aplicación; Docker solo empaqueta la aplicación y guarda su carpeta `data/`.
 
 ## Base de datos
