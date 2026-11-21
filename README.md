@@ -62,19 +62,38 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Docker
 
-El proyecto no incluye archivos de Docker: se usa la imagen ya publicada en Docker Hub (requiere Docker Desktop encendido).
+Requiere Docker Desktop encendido. El `Dockerfile` usa construcción multi-stage: `eclipse-temurin:21-jdk` compila el `.jar` y `eclipse-temurin:21-jre` lo ejecuta (imagen final más liviana).
 
 ```bash
-docker run -d --name parking -p 8080:8080 -p 7070:7070 -v parking-data:/app/data TU_USUARIO/parking-integrator:1.0
+# Construir la imagen (desde la carpeta del proyecto)
+docker build -t parking-integrator .
+
+# Ejecutar el contenedor
+docker run -d --name parking -p 8080:8080 -p 7070:7070 -v parking-data:/app/data parking-integrator
 ```
 
-- Imagen: https://hub.docker.com/r/TU_USUARIO/parking-integrator
 - Vistas: http://localhost:8080 · REST: http://localhost:7070/api · usuarios: `admin` / `admin123` y `operator` / `operator123`
-- La base de datos es **H2 en archivo**, y vive dentro del contenedor en `/app/data/parking.mv.db`. El volumen `parking-data` hace que los datos se conserven aunque el contenedor se detenga o se borre.
+- La base de datos es **H2 en archivo** y vive dentro del contenedor, en `/app/data/parking.mv.db`. El volumen `parking-data` hace que los datos se conserven aunque el contenedor se detenga o se borre.
 - Detener: `docker stop parking` · volver a iniciar: `docker start parking`
 - Borrar el contenedor: `docker rm -f parking` (los datos siguen en el volumen)
 - Empezar de cero con la base vacía: `docker rm -f parking` y `docker volume rm parking-data`
-- Docker no reemplaza a H2: H2 sigue corriendo dentro de la aplicación; Docker solo empaqueta la aplicación y guarda su carpeta `data/`.
+- Docker no reemplaza a H2: H2 corre dentro de la aplicación; Docker solo la empaqueta y guarda su carpeta `data/`.
+
+### Variables de entorno (opcionales)
+
+La conexión a la base se puede cambiar sin tocar el código, con `-e` en `docker run` o con variables de entorno al ejecutar:
+
+| Variable | Valor por defecto | Para qué sirve |
+|---|---|---|
+| `DB_URL` | `jdbc:h2:file:./data/parking` | Dónde está la base. Para una base temporal en memoria: `jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1` |
+| `DB_USER` | `sa` | Usuario de la base |
+| `DB_PASSWORD` | (vacía) | Contraseña de la base |
+
+Ejemplo con una base en memoria (los datos se pierden al detener el contenedor):
+
+```bash
+docker run -p 8080:8080 -p 7070:7070 -e DB_URL="jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1" parking-integrator
+```
 
 ## Base de datos
 
@@ -83,7 +102,7 @@ H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`
 - **Empezar de cero:** cerrar la aplicación y borrar la carpeta `data/`.
 - **Una sola aplicación a la vez:** no se debe ejecutar dos copias con la misma carpeta `data/` (los puertos 8080 y 7070 tampoco lo permiten).
 - **Dónde queda `data/`:** en la carpeta desde la que se ejecuta el proyecto. Con `gradlew bootRun` o con el botón verde de IntelliJ es la carpeta raíz del proyecto.
-- **Base temporal en memoria:** cambiar `DB_URL` en `Application` por `jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1`.
+- **Base temporal en memoria:** definir la variable de entorno `DB_URL` con `jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1`.
 - **Sin base de datos:** cambiar los `new H2...Repository(jdbi)` por `new InMemory...Repository()`.
 
 ## Pendiente

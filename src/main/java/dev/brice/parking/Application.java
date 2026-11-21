@@ -26,14 +26,14 @@ import java.time.Clock;
 // Raiz de composicion: aqui (y solo aqui) se eligen los adapters y se conectan con el core.
 public class Application {
     private static final int REST_PORT = 7070;
-    private static final String DB_URL = "jdbc:h2:file:./data/parking";
 
     public static void main(String[] args) {
         Clock clock = Clock.systemDefaultZone();
 
         // Base de datos H2 en un archivo (carpeta data/ del proyecto): los datos se conservan entre arranques.
-        // Para una base temporal en memoria: "jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1"
-        Jdbi jdbi = Jdbi.create(DB_URL, "sa", "");
+        // Se puede cambiar sin tocar el codigo con las variables de entorno DB_URL, DB_USER y DB_PASSWORD.
+        // Para una base temporal en memoria: DB_URL=jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1
+        Jdbi jdbi = Jdbi.create(env("DB_URL", "jdbc:h2:file:./data/parking"), env("DB_USER", "sa"), env("DB_PASSWORD", ""));
         jdbi.installPlugin(new SqlObjectPlugin());
 
         // Adaptadores de salida (puertos). El orden importa: ticket tiene llave foranea a cupo.
@@ -62,5 +62,10 @@ public class Application {
 
         SpringUI springUI = new SpringUI(userService, slotService, tariffService, parkingService, reportService, passwordHasher);
         springUI.runServer(args);
+    }
+
+    private static String env(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null || value.isBlank() ? defaultValue : value;
     }
 }
