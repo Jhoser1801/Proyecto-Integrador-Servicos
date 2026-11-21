@@ -18,9 +18,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/error", "/error/**", "/cupos").permitAll()
+                        .requestMatchers("/", "/css/**", "/error", "/error/**", "/cupos").permitAll()
+                        // consola web de H2: solo el administrador (y H2 solo acepta conexiones de este equipo)
+                        .requestMatchers("/h2/**").hasRole(UserRole.ADMIN.name())
                         .requestMatchers("/slots/**", "/tariffs/**", "/reports/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().authenticated())
+                // la consola de H2 usa formularios sin token CSRF y marcos (frames) de la misma pagina
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2/**"))
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
         return http.build();

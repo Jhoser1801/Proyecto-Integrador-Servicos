@@ -40,6 +40,7 @@ dependencies {
     implementation("org.jdbi:jdbi3-core:3.55.0")      //jdbi
     implementation("org.jdbi:jdbi3-sqlobject:3.55.0") //jdbi
     runtimeOnly("com.h2database:h2")                  //h2
+    runtimeOnly("org.springframework.boot:spring-boot-h2console") // consola web de H2 en /h2
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -5,6 +5,8 @@ import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
 import dev.brice.parking.core.service.ParkingService;
 import dev.brice.parking.core.service.SlotService;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +35,11 @@ public class DashboardController {
     }
 
     @GetMapping("/")
-    public String dashboard(Model model) {
+    public String dashboard(Model model, Authentication authentication) {
+        // Sin sesion, la raiz muestra la pagina publica: el login no tiene boton, se entra escribiendo /login
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return "redirect:/cupos";
+        }
         Map<UUID, ParkingTicket> openBySlot = parking.findOpenTickets().stream()
                 .collect(Collectors.toMap(ParkingTicket::slotId, Function.identity()));
         List<Bay> bays = slots.findAllSlots().stream()
