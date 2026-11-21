@@ -51,10 +51,9 @@ public class Application {
         ReportService reportService = new ReportService(ticketRepository, slotRepository);
         ParkingService parkingService = new ParkingService(ticketRepository, slotRepository, tariffRepository, clock);
 
-        // datos de prueba: solo la primera vez, cuando la base esta vacia
-        if (userRepository.findAllUsers().isEmpty()) {
-            SeedData.load(userService, slotService, tariffService, ticketRepository, slotRepository, tariffRepository);
-        }
+        // datos de prueba: DataSeed solo siembra la primera vez, cuando la base esta vacia
+        new DataSeed(userRepository, userService, slotService, tariffService, ticketRepository, slotRepository, tariffRepository,
+                env("ADMIN_USER", "admin"), env("ADMIN_PASSWORD", "admin123")).run();
 
         // Adaptadores de interfaz: REST (Javalin) y vistas (Spring + Thymeleaf)
         JavalinUI javalinUI = new JavalinUI(parkingService, slotService, tariffService, reportService, userService);

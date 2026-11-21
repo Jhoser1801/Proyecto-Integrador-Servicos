@@ -9,7 +9,7 @@
 ```
 src/main/java/dev/brice/parking/
 ├── Application.java          raíz de composición: elige adapters y arma los casos de uso
-├── SeedData.java             datos de prueba
+├── DataSeed.java             datos de prueba (solo se siembran si la base está vacía)
 ├── core/                     DOMINIO (Java puro, sin framework)
 │   ├── constant/             enums (VehicleType, SlotStatus, TicketStatus, UserRole)
 │   ├── entity/               ParkingSlot, ParkingTicket, Tariff, User (records con validación)
@@ -62,7 +62,7 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Base de datos
 
-H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`, sin clave). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `SeedData` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `SeedData` no se repite.
+H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`, sin clave). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `DataSeed` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `DataSeed` no se repite (tiene una guarda al inicio: si ya hay usuarios, no siembra).
 
 - **Empezar de cero:** cerrar la aplicación y borrar la carpeta `data/`.
 - **Una sola aplicación a la vez:** no se debe ejecutar dos copias con la misma carpeta `data/` (los puertos 8080 y 7070 tampoco lo permiten).
@@ -72,13 +72,15 @@ H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`
 
 ### Variables de entorno (opcionales)
 
-La conexión se puede cambiar sin tocar el código. Si no se definen, se usan los valores por defecto:
+La conexión y el administrador inicial se pueden cambiar sin tocar el código. Si no se definen, se usan los valores por defecto:
 
 | Variable | Valor por defecto | Para qué sirve |
 |---|---|---|
 | `DB_URL` | `jdbc:h2:file:./data/parking` | Dónde está la base |
 | `DB_USER` | `sa` | Usuario de la base |
 | `DB_PASSWORD` | (vacía) | Contraseña de la base |
+| `ADMIN_USER` | `admin` | Usuario del administrador que crea `DataSeed` (solo la primera vez) |
+| `ADMIN_PASSWORD` | `admin123` | Contraseña de ese administrador |
 
 ## Pendiente
 
