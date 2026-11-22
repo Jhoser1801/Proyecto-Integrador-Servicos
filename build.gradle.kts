@@ -34,7 +34,6 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    implementation("org.mindrot:jbcrypt:0.4") // hash de contraseñas
 
     // persistencia: JDBI + H2
     implementation("org.jdbi:jdbi3-core:3.55.0")      //jdbi

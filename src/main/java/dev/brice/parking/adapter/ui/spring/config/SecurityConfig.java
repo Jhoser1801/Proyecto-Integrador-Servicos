@@ -2,12 +2,12 @@ package dev.brice.parking.adapter.ui.spring.config;
 
 import dev.brice.parking.core.constant.UserRole;
 import dev.brice.parking.core.service.UserService;
-import dev.brice.parking.core.port.PasswordHasher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -19,8 +19,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/css/**", "/error", "/error/**", "/cupos").permitAll()
-                        // consola web de H2: solo el administrador (y H2 solo acepta conexiones de este equipo)
-                        .requestMatchers("/h2/**").hasRole(UserRole.ADMIN.name())
+                        // consola web de H2: abre directo; H2 pide su propio usuario y contrasena
+                        .requestMatchers("/h2/**").permitAll()
                         .requestMatchers("/slots/**", "/tariffs/**", "/reports/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().authenticated())
                 // la consola de H2 usa formularios sin token CSRF y marcos (frames) de la misma pagina
@@ -31,20 +31,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Spring Security valida la contrasena con el mismo PasswordHasher (puerto) que usa el core
+    // BCrypt de Spring Security: valida el login (genera hashes compatibles con BCryptPasswordHasher)
     @Bean
-    PasswordEncoder passwordEncoder(PasswordHasher hasher) {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return hasher.hash(rawPassword.toString());
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return hasher.matches(rawPassword.toString(), encodedPassword);
-            }
-        };
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
