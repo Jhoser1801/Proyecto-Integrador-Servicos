@@ -1,9 +1,7 @@
-/* ==========================================================================
-   Parqueadero - hoja de estilos unica
+/*
    Orden: 1 variables · 2 base · 3 estructura · 4 componentes · 5 pantallas · 6 adaptable e impresion
-   Regla: las pantallas se arman con las piezas del bloque 4 (card, btn, badge, field, table...).
-   Nada de estilos escritos dentro del HTML y nada de JavaScript.
-   ========================================================================== */
+
+ */
 
 /* ---------- 1. Variables ---------- */
 :root {
