@@ -27,17 +27,15 @@ import java.io.InputStream;
 import java.time.Clock;
 import java.util.Properties;
 
-// Raiz de composicion: aqui (y solo aqui) se eligen los adapters y se conectan con el core.
+// Raiz de composicion: aqui se eligen los adapters y se conectan con el core.
 public class Application {
     private static final int REST_PORT = 7070;
 
     public static void main(String[] args) {
         Clock clock = Clock.systemDefaultZone();
 
-        // Base de datos H2 en un archivo (carpeta data/ del proyecto): los datos se conservan entre arranques.
-        // La URL, el usuario y la contrasena salen de application.properties (app.db.*), igual que en
-        // business-sales-project, y se pueden reemplazar con las variables de entorno DB_URL, DB_USER y DB_PASSWORD.
-        // La primera vez, H2 crea la base con ese usuario y contrasena; despues hay que usar los mismos.
+        // La URL, el usuario y la contraseña salen de application.properties
+        // La primera vez, H2 crea la base con ese usuario y contraseña; después hay que usar los mismos.
         Jdbi jdbi = Jdbi.create(
                 setting("DB_URL", "app.db.url", "jdbc:h2:file:./data/parking"),
                 setting("DB_USER", "app.db.username", "parking"),
@@ -89,12 +87,11 @@ public class Application {
                 properties.load(in);
             }
         } catch (IOException e) {
-            // sin archivo de propiedades se usan los valores por defecto
         }
         return properties;
     }
 
-    // Si la base ya existia con otro usuario o contrasena, avisa claro en vez de mostrar un error largo de H2
+    // Si la base ya existia con otro usuario o contraseña, avisa claro en vez de mostrar un error largo de H2
     private static void checkDatabaseAccess(Jdbi jdbi) {
         try {
             jdbi.useHandle(handle -> handle.execute("select 1"));

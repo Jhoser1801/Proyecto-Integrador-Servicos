@@ -20,8 +20,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-// Datos de prueba. Funciona como el DataSeed de Latinoamerica Comparte: una guarda al inicio
-// (si la base ya tiene datos no siembra) y despues pasos numerados que crean todo explicitamente.
+// Datos de prueba.
 // Se crea con los servicios del core, asi cada dato pasa por las mismas reglas que en la aplicacion.
 final class DataSeed {
     private final UserRepository userRepository;
@@ -50,7 +49,7 @@ final class DataSeed {
 
     void run() {
 
-        // Guard: si ya hay datos en la base, no volver a sembrar
+        // Guarda: si ya hay datos en la base, para no volver a sembrar
         if (!userRepository.findAllUsers().isEmpty()) {
             return;
         }
