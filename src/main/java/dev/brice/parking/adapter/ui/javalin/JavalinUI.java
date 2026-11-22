@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.brice.parking.core.constant.UserRole;
 import dev.brice.parking.core.dto.CheckInDTO;
@@ -35,11 +36,13 @@ public class JavalinUI {
     private final TariffService tariffs;
     private final ReportService reports;
     private final UserService users;
-    private final ObjectMapper json = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
+    // JsonMapper.builder() es la forma actual de configurar Jackson (ObjectMapper.disable(MapperFeature) esta obsoleto)
+    private final ObjectMapper json = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(MapperFeature.AUTO_DETECT_IS_GETTERS) // no exponer isFree()/isOpen() como campos
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
 
     public JavalinUI(ParkingService parking, SlotService slots, TariffService tariffs,
                    ReportService reports, UserService users) {
