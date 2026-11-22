@@ -33,7 +33,7 @@ class ParkingServiceTest {
         InMemorySlotRepository slots = new InMemorySlotRepository();
         InMemoryTicketRepository tickets = new InMemoryTicketRepository();
         InMemoryTariffRepository tariffs = new InMemoryTariffRepository();
-        slotService = new SlotService(slots);
+        slotService = new SlotService(slots, tickets);
         parking = new ParkingService(tickets, slots, tariffs, clock);
 
         new TariffService(tariffs).setTariff(new TariffDTO(VehicleType.CAR, new BigDecimal("3000")));

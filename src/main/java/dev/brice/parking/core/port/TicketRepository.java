@@ -13,6 +13,7 @@ public interface TicketRepository {
     Optional<ParkingTicket> findTicketById(UUID id);
     Optional<ParkingTicket> findOpenTicketByPlate(String plate);
     List<ParkingTicket> findAllTickets();
+    boolean existsTicketBySlotId(UUID slotId);
     List<ParkingTicket> findClosedTicketsBetween(LocalDateTime from, LocalDateTime toExclusive);
 
 }

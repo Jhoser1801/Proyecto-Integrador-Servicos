@@ -6,8 +6,9 @@ import dev.brice.parking.core.service.TariffService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -25,16 +26,17 @@ public class TariffController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("tariffs", tariffs.findAllTariffs());
-        model.addAttribute("vehicleTypes", VehicleType.values());
-        model.addAttribute("form", new TariffDTO(VehicleType.CAR, BigDecimal.ZERO));
         return "tariffs/list";
     }
 
-    @PostMapping
-    public String save(@ModelAttribute("form") TariffDTO form, RedirectAttributes redirect) {
+    // PUT: actualiza la tarifa de un tipo de vehiculo (el formulario envia _method=put)
+    @PutMapping("/{vehicleType}")
+    public String update(@PathVariable VehicleType vehicleType,
+                         @RequestParam BigDecimal hourlyRate,
+                         RedirectAttributes redirect) {
         try {
-            tariffs.setTariff(form);
-            redirect.addFlashAttribute("success", "Tarifa guardada");
+            tariffs.setTariff(new TariffDTO(vehicleType, hourlyRate));
+            redirect.addFlashAttribute("success", "Tarifa de " + vehicleType.getVisualName().toLowerCase() + " actualizada");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }

@@ -53,6 +53,9 @@ El sistema **no tiene ningún botón de login a la vista**: al personal se le da
 | `/cupos` | Cualquier persona, sin sesión | Cantidad de cupos libres (no muestra placas, horas ni códigos de cupo). Es también lo que se ve al abrir `/` sin sesión |
 | `/login` | Personal (se escribe la ruta) | Inicio de sesión. Es la única forma de llegar a las pantallas internas |
 | `/` | Con sesión | Mapa de cupos y registro de entradas |
+| `/slots` | Solo el administrador | Crear, editar (PUT) y eliminar (DELETE) cupos |
+| `/tariffs` | Solo el administrador | Actualizar (PUT) la tarifa de cada tipo de vehículo |
+| `/users` | Solo el administrador | Crear, editar (PUT) y eliminar (DELETE) operadores y administradores |
 | `/h2` | Solo el administrador | Consola web de H2 para ver y consultar las tablas |
 
 ### Consola web de H2 (`/h2`)
@@ -68,7 +71,16 @@ Como en `business-sales-project`, la base se puede mirar desde el navegador. Con
 Se ven las tablas `PARKING_SLOT`, `PARKING_TICKET`, `TARIFF` y `APP_USER` y se pueden hacer consultas, por ejemplo `select * from parking_ticket`. La consola solo la abre el administrador con sesión iniciada (si no, lleva al login), y H2 solo acepta conexiones desde el mismo equipo.
 
 
-El operador registra entradas/salidas y ve tickets; el administrador además gestiona cupos, tarifas y reportes.
+El operador registra entradas/salidas y ve tickets; el administrador además gestiona cupos, tarifas, usuarios y reportes.
+
+### Actualizar y eliminar (PUT y DELETE)
+
+Los formularios HTML solo envían GET y POST. Para usar **PUT** y **DELETE** como en Latinoamérica Comparte, `application.properties` activa `spring.mvc.hiddenmethod.filter.enabled=true` y las plantillas usan `th:method="put"` / `th:method="delete"` (Thymeleaf agrega el campo oculto `_method`). Los controladores reciben `@PutMapping` y `@DeleteMapping`.
+
+Reglas de negocio:
+
+- **Cupos:** solo se edita o elimina un cupo **libre**. El código no se repite. Un cupo que ya tuvo tickets no se elimina (se perdería el historial y los reportes) ni cambia de tipo de vehículo.
+- **Usuarios:** la contraseña se guarda con BCrypt; al editar, si el campo contraseña queda vacío se conserva la actual (si se escribe, mínimo 6 caracteres). No se puede eliminar la propia cuenta ni dejar el sistema sin administradores (ni eliminando ni cambiando el rol del último).
 
 ## API REST (HTTP Basic con los mismos usuarios)
 
@@ -76,9 +88,15 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 |--------|------|-----|
 | GET | `/api/slots`, `/api/tariffs`, `/api/tickets`, `/api/tickets/open`, `/api/tickets/{id}` | cualquiera |
 | POST | `/api/slots` `{"code":"A9","vehicleType":"CAR"}` | ADMIN |
-| PUT | `/api/tariffs` `{"vehicleType":"CAR","hourlyRate":3000}` | ADMIN |
+| PUT | `/api/slots/{id}` `{"code":"A9","vehicleType":"CAR"}` | ADMIN |
+| DELETE | `/api/slots/{id}` (204) | ADMIN |
+| GET | `/api/users` (sin contraseñas) | ADMIN |
+| POST | `/api/users` `{"username":"oper2","password":"clave123","role":"OPERATOR"}` | ADMIN |
+| PUT | `/api/users/{id}` `{"role":"ADMIN","password":"nueva123"}` (password opcional) | ADMIN |
+| DELETE | `/api/users/{id}` (204) | ADMIN |
+| PUT | `/api/tariffs/{vehicleType}` `{"hourlyRate":3000}` (CAR o MOTORCYCLE) | ADMIN |
 | POST | `/api/tickets/check-in` `{"plate":"ABC123","vehicleType":"CAR"}` | cualquiera |
-| POST | `/api/tickets/{id}/check-out` | cualquiera |
+| PUT | `/api/tickets/{id}/check-out` | cualquiera |
 | GET | `/api/tickets/{id}/receipt` (JSON, ticket cerrado) | cualquiera |
 | GET | `/api/reports/revenue?from=yyyy-MM-dd&to=yyyy-MM-dd` (JSON) | ADMIN |
 

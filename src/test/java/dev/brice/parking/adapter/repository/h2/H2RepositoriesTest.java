@@ -60,6 +60,24 @@ class H2RepositoriesTest {
     }
 
     @Test
+    void slotAndUserAreDeletedAndTicketsReferenceSlot() {
+        ParkingSlot used = newSlot("A1", VehicleType.CAR);
+        ParkingSlot unused = newSlot("A2", VehicleType.CAR);
+        tickets.saveTicket(ParkingTicket.open(UUID.randomUUID(), "ABC123", VehicleType.CAR, used.id(), ENTRY));
+
+        assertTrue(tickets.existsTicketBySlotId(used.id()));
+        assertFalse(tickets.existsTicketBySlotId(unused.id()));
+        slots.deleteSlotById(unused.id());
+        assertTrue(slots.findSlotById(unused.id()).isEmpty());
+
+        User user = new User(UUID.randomUUID(), "oper", "hash", UserRole.OPERATOR);
+        users.saveUser(user);
+        assertEquals(user, users.findUserById(user.id()).orElseThrow());
+        users.deleteUserById(user.id());
+        assertTrue(users.findUserById(user.id()).isEmpty());
+    }
+
+    @Test
     void freeSlotsAreFilteredByTypeAndStatus() {
         ParkingSlot car1 = newSlot("A1", VehicleType.CAR);
         newSlot("A2", VehicleType.CAR);

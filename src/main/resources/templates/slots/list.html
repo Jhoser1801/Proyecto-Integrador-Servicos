@@ -22,14 +22,30 @@
             <button type="submit">Crear cupo</button>
         </form>
     </section>
+    <p>Un cupo ocupado no se puede editar ni eliminar. Un cupo que ya tuvo tickets tampoco se elimina (se conserva el historial) ni cambia de tipo de vehículo.</p>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Cupo</th><th>Tipo</th><th>Estado</th></tr></thead>
+            <thead><tr><th>Estado</th><th>Editar cupo</th><th>Eliminar</th></tr></thead>
             <tbody>
             <tr th:each="s : ${slots}">
-                <td class="plate" th:text="${s.code}"></td>
-                <td th:text="${s.vehicleType.visualName}"></td>
                 <td><span class="state" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'open'" th:text="${s.status.visualName}"></span></td>
+                <td>
+                    <form class="inline-form" th:action="@{/slots/{id}(id=${s.id})}" th:method="put">
+                        <input name="code" th:value="${s.code}" maxlength="10" required class="plate"
+                               th:disabled="${!s.free}" th:aria-label="'Código del cupo ' + ${s.code}">
+                        <select name="vehicleType" th:disabled="${!s.free}" th:aria-label="'Tipo del cupo ' + ${s.code}">
+                            <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}"
+                                    th:selected="${t == s.vehicleType}"></option>
+                        </select>
+                        <button type="submit" class="compact" th:disabled="${!s.free}">Guardar</button>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{/slots/{id}(id=${s.id})}" th:method="delete"
+                          th:attr="onsubmit=|return confirm('¿Eliminar el cupo ${s.code}?')|">
+                        <button type="submit" class="compact danger" th:disabled="${!s.free}">Eliminar</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>

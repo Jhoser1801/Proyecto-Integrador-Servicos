@@ -55,7 +55,7 @@ public class Application {
 
         // Casos de uso (services del core)
         UserService userService = new UserService(userRepository, passwordHasher);
-        SlotService slotService = new SlotService(slotRepository);
+        SlotService slotService = new SlotService(slotRepository, ticketRepository);
         TariffService tariffService = new TariffService(tariffRepository);
         ReportService reportService = new ReportService(ticketRepository, slotRepository);
         ParkingService parkingService = new ParkingService(ticketRepository, slotRepository, tariffRepository, clock);

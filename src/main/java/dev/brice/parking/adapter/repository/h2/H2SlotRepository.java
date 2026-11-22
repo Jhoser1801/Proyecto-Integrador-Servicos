@@ -47,6 +47,11 @@ public class H2SlotRepository implements SlotRepository {
         return slotDAO.findFreeSlotsByType(vehicleType);
     }
 
+    @Override
+    public void deleteSlotById(UUID id) {
+        slotDAO.deleteSlotById(id);
+    }
+
     private void setupTables() {
         jdbi.useHandle(handle -> handle.execute("""
                 create table if not exists parking_slot (

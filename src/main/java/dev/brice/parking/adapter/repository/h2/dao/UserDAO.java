@@ -20,6 +20,12 @@ public interface UserDAO {
     @SqlUpdate("merge into app_user (user_id, username, password_hash, role) key (user_id) values (?,?,?,?)")
     void upsertUser(UUID id, String username, String passwordHash, UserRole role);
 
+    @SqlQuery("select * from app_user where user_id = ?")
+    Optional<User> findUserById(UUID id);
+
+    @SqlUpdate("delete from app_user where user_id = ?")
+    void deleteUserById(UUID id);
+
     @SqlQuery("select * from app_user where lower(username) = lower(?)")
     Optional<User> findUserByUsername(String username);
 

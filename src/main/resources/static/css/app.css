@@ -44,6 +44,9 @@ button, .btn { display: inline-block; font: 600 1rem var(--font); background: va
 button:hover, .btn:hover { background: var(--sign-deep); }
 .btn.quiet { background: transparent; color: var(--sign); border: 1.5px solid var(--sign); }
 .btn.quiet:hover { background: var(--paint); }
+button.danger { background: var(--bad); }
+button.danger:hover { background: #8c1d18; }
+button:disabled { opacity: .45; cursor: not-allowed; }
 button.compact { padding: .3rem .8rem; font-size: .95rem; }
 label { display: block; font-weight: 600; margin: 0 0 .25rem; }
 input, select { font: inherit; width: 100%; max-width: 22rem; padding: .55rem .7rem; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
@@ -110,6 +113,10 @@ td.num, th.num { text-align: right; }
 .empty { padding: 1.5rem; color: var(--muted); }
 .inline-form { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
 .inline-form .field { margin: 0; }
+td .inline-form { gap: .5rem; flex-wrap: nowrap; align-items: center; }
+td .inline-form input { max-width: 8rem; }
+td .inline-form select { max-width: 11rem; }
+td form { margin: 0; }
 .stack > * + * { margin-top: 1.5rem; }
 
 /* ---- comprobante ---- */

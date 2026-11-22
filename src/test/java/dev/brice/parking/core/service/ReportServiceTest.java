@@ -35,8 +35,8 @@ class ReportServiceTest {
         reports = new ReportService(tickets, slots);
 
         new TariffService(tariffs).setTariff(new TariffDTO(VehicleType.CAR, new BigDecimal("3000")));
-        new SlotService(slots).createSlot(new SlotDTO("A1", VehicleType.CAR));
-        new SlotService(slots).createSlot(new SlotDTO("A2", VehicleType.CAR));
+        new SlotService(slots, tickets).createSlot(new SlotDTO("A1", VehicleType.CAR));
+        new SlotService(slots, tickets).createSlot(new SlotDTO("A2", VehicleType.CAR));
     }
 
     @Test

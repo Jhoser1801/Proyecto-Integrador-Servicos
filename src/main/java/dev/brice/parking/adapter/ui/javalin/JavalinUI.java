@@ -7,9 +7,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.brice.parking.core.constant.UserRole;
+import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.dto.SlotDTO;
 import dev.brice.parking.core.dto.TariffDTO;
+import dev.brice.parking.core.dto.UserDTO;
+import dev.brice.parking.core.dto.UserUpdateDTO;
 import dev.brice.parking.core.entity.User;
 import dev.brice.parking.core.service.ParkingService;
 import dev.brice.parking.core.service.ReportService;
@@ -63,11 +66,42 @@ public class JavalinUI {
                 ctx.status(HttpStatus.CREATED);
                 respond(ctx, slots.createSlot(body(ctx, SlotDTO.class)));
             });
+            config.routes.put("/api/slots/{id}", ctx -> {
+                requireAdmin(ctx);
+                respond(ctx, slots.updateSlot(id(ctx), body(ctx, SlotDTO.class)));
+            });
+            config.routes.delete("/api/slots/{id}", ctx -> {
+                requireAdmin(ctx);
+                slots.deleteSlot(id(ctx));
+                ctx.status(HttpStatus.NO_CONTENT);
+            });
+
+            // usuarios (solo ADMIN). La respuesta nunca incluye la contrasena ni su hash
+            config.routes.get("/api/users", ctx -> {
+                requireAdmin(ctx);
+                respond(ctx, users.findAllUsers().stream().map(this::publicView).toList());
+            });
+            config.routes.post("/api/users", ctx -> {
+                requireAdmin(ctx);
+                ctx.status(HttpStatus.CREATED);
+                respond(ctx, publicView(users.createUser(body(ctx, UserDTO.class))));
+            });
+            config.routes.put("/api/users/{id}", ctx -> {
+                requireAdmin(ctx);
+                respond(ctx, publicView(users.updateUser(id(ctx), body(ctx, UserUpdateDTO.class))));
+            });
+            config.routes.delete("/api/users/{id}", ctx -> {
+                requireAdmin(ctx);
+                User acting = ctx.attribute(USER_ATTRIBUTE);
+                users.deleteUser(id(ctx), acting.username());
+                ctx.status(HttpStatus.NO_CONTENT);
+            });
 
             config.routes.get("/api/tariffs", ctx -> respond(ctx, tariffs.findAllTariffs()));
-            config.routes.put("/api/tariffs", ctx -> {
+            config.routes.put("/api/tariffs/{vehicleType}", ctx -> {
                 requireAdmin(ctx);
-                respond(ctx, tariffs.setTariff(body(ctx, TariffDTO.class)));
+                TariffDTO dto = body(ctx, TariffDTO.class);
+                respond(ctx, tariffs.setTariff(new TariffDTO(VehicleType.valueOf(ctx.pathParam("vehicleType").toUpperCase()), dto.hourlyRate())));
             });
 
             config.routes.get("/api/tickets", ctx -> respond(ctx, parking.findAllTickets()));
@@ -78,7 +112,7 @@ public class JavalinUI {
                 ctx.status(HttpStatus.CREATED);
                 respond(ctx, parking.checkIn(body(ctx, CheckInDTO.class)));
             });
-            config.routes.post("/api/tickets/{id}/check-out", ctx -> respond(ctx, parking.checkOut(id(ctx))));
+            config.routes.put("/api/tickets/{id}/check-out", ctx -> respond(ctx, parking.checkOut(id(ctx))));
 
 
             config.routes.get("/api/tickets/{id}/receipt", ctx -> respond(ctx, reports.buildReceipt(id(ctx))));
@@ -109,6 +143,10 @@ public class JavalinUI {
         if (user == null || user.role() != UserRole.ADMIN) {
             throw new ForbiddenResponse("Solo el administrador puede hacer esto");
         }
+    }
+
+    private Map<String, Object> publicView(User user) {
+        return Map.of("id", user.id(), "username", user.username(), "role", user.role());
     }
 
     private <T> T body(Context ctx, Class<T> type) throws com.fasterxml.jackson.core.JsonProcessingException {

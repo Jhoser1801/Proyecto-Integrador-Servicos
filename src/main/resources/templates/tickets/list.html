@@ -22,7 +22,7 @@
                 <td class="num" th:text="${t.totalAmount != null} ? '$' + ${#numbers.formatDecimal(t.totalAmount, 1, 'POINT', 0, 'COMMA')} : '-'"></td>
                 <td><span class="state" th:classappend="${t.status.name() == 'OPEN'} ? 'open'" th:text="${t.status.visualName}"></span></td>
                 <td>
-                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" method="post" style="margin:0">
+                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" th:method="put" style="margin:0">
                         <button class="compact" type="submit">Registrar salida</button>
                     </form>
                     <a th:unless="${t.status.name() == 'OPEN'}" th:href="@{/tickets/{id}(id=${t.id})}">Ver comprobante</a>

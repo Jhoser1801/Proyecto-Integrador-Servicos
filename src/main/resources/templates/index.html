@@ -18,7 +18,7 @@
                         <th:block th:if="${b.busy}">
                             <span class="bay-plate" th:text="${b.ticket.plate}">ABC123</span>
                             <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
-                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" method="post">
+                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" th:method="put">
                                 <button class="compact" type="submit">Registrar salida</button>
                             </form>
                         </th:block>
@@ -38,7 +38,7 @@
                         <th:block th:if="${b.busy}">
                             <span class="bay-plate" th:text="${b.ticket.plate}">MOT45A</span>
                             <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
-                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" method="post">
+                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" th:method="put">
                                 <button class="compact" type="submit">Registrar salida</button>
                             </form>
                         </th:block>

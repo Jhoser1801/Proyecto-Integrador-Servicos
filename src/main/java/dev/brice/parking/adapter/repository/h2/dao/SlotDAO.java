@@ -34,6 +34,9 @@ public interface SlotDAO {
     @SqlQuery("select * from parking_slot where vehicle_type = ? and status = 'FREE' order by code")
     List<ParkingSlot> findFreeSlotsByType(VehicleType vehicleType);
 
+    @SqlUpdate("delete from parking_slot where slot_id = ?")
+    void deleteSlotById(UUID id);
+
     class Mapper implements RowMapper<ParkingSlot> {
         @Override
         public ParkingSlot map(ResultSet rs, StatementContext ctx) throws SQLException {

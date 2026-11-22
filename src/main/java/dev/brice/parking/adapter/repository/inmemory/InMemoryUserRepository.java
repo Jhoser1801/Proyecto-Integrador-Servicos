@@ -6,6 +6,7 @@ import dev.brice.parking.core.port.UserRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryUserRepository implements UserRepository {
@@ -14,6 +15,16 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public void saveUser(User user) {
         users.put(user.username().toLowerCase(), user);
+    }
+
+    @Override
+    public Optional<User> findUserById(UUID id) {
+        return users.values().stream().filter(user -> user.id().equals(id)).findFirst();
+    }
+
+    @Override
+    public void deleteUserById(UUID id) {
+        users.values().removeIf(user -> user.id().equals(id));
     }
 
     @Override

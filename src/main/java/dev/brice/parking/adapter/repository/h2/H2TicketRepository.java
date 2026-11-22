@@ -49,6 +49,11 @@ public class H2TicketRepository implements TicketRepository {
         return ticketDAO.findClosedTicketsBetween(from, toExclusive);
     }
 
+    @Override
+    public boolean existsTicketBySlotId(UUID slotId) {
+        return ticketDAO.existsTicketBySlotId(slotId);
+    }
+
     private void setupTables() {
         jdbi.useHandle(handle -> handle.execute("""
                 create table if not exists parking_ticket (

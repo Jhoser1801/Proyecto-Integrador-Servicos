@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,7 +50,8 @@ public class TicketController {
         return "redirect:/";
     }
 
-    @PostMapping("/{id}/check-out")
+    // PUT: actualiza el ticket a cerrado (salida del vehiculo)
+    @PutMapping("/{id}/check-out")
     public String checkOut(@PathVariable UUID id, RedirectAttributes redirect) {
         try {
             parking.checkOut(id);

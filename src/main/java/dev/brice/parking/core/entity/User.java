@@ -28,4 +28,12 @@ public record User(
             throw new IllegalArgumentException("El rol no puede ser nulo");
         }
     }
+
+    public User withRole(UserRole newRole) {
+        return new User(id, username, passwordHash, newRole);
+    }
+
+    public User withPasswordHash(String newPasswordHash) {
+        return new User(id, username, newPasswordHash, role);
+    }
 }

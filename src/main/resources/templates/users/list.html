@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Usuarios')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+<main class="stack">
+    <h1>Usuarios</h1>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+    <section class="panel" aria-labelledby="new-user">
+        <h2 id="new-user">Crear usuario</h2>
+        <form class="inline-form" th:action="@{/users}" th:object="${form}" method="post">
+            <div class="field">
+                <label for="username">Usuario</label>
+                <input id="username" th:field="*{username}" maxlength="30" placeholder="operador2" required>
+            </div>
+            <div class="field">
+                <label for="password">Contraseña (mínimo 6)</label>
+                <input id="password" th:field="*{password}" type="password" minlength="6" autocomplete="new-password" required>
+            </div>
+            <div class="field">
+                <label for="role">Rol</label>
+                <select id="role" th:field="*{role}">
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r.visualName}"></option>
+                </select>
+            </div>
+            <button type="submit">Crear usuario</button>
+        </form>
+    </section>
+    <p>Para cambiar la contraseña, escriba una nueva; si la deja vacía se conserva la actual. No se puede eliminar la propia cuenta ni dejar el sistema sin administradores.</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Usuario</th><th>Editar rol y contraseña</th><th>Eliminar</th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td><strong th:text="${u.username}"></strong>
+                    <span th:if="${u.username == currentUsername}"> (usted)</span></td>
+                <td>
+                    <form class="inline-form" th:action="@{/users/{id}(id=${u.id})}" th:method="put">
+                        <select name="role" th:aria-label="'Rol de ' + ${u.username}">
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r.visualName}"
+                                    th:selected="${r == u.role}"></option>
+                        </select>
+                        <input name="password" type="password" minlength="6" placeholder="Nueva contraseña (opcional)"
+                               autocomplete="new-password" th:aria-label="'Nueva contraseña de ' + ${u.username}">
+                        <button type="submit" class="compact">Guardar</button>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{/users/{id}(id=${u.id})}" th:method="delete"
+                          th:attr="onsubmit=|return confirm('¿Eliminar al usuario ${u.username}?')|">
+                        <button type="submit" class="compact danger" th:disabled="${u.username == currentUsername}">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

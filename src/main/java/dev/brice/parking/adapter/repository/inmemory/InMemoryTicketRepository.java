@@ -36,6 +36,11 @@ public class InMemoryTicketRepository implements TicketRepository {
     }
 
     @Override
+    public boolean existsTicketBySlotId(UUID slotId) {
+        return tickets.values().stream().anyMatch(ticket -> ticket.slotId().equals(slotId));
+    }
+
+    @Override
     public List<ParkingTicket> findClosedTicketsBetween(LocalDateTime from, LocalDateTime toExclusive) {
         return tickets.values().stream()
                 .filter(ticket -> !ticket.isOpen())

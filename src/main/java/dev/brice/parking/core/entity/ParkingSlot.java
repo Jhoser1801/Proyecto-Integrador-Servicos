@@ -34,6 +34,11 @@ public record ParkingSlot(
         return status == SlotStatus.FREE;
     }
 
+    // Cambia el codigo y el tipo de vehiculo; conserva id y estado
+    public ParkingSlot updateData(String newCode, VehicleType newType) {
+        return new ParkingSlot(id, newCode, newType, status);
+    }
+
     public ParkingSlot occupy() {
         if (status == SlotStatus.OCCUPIED) {
             throw new IllegalArgumentException("El cupo " + code + " ya esta ocupado");

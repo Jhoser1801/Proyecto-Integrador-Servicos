@@ -37,6 +37,9 @@ public interface TicketDAO {
     @SqlQuery("select * from parking_ticket where status = 'CLOSED' and exit_at >= ? and exit_at < ? order by exit_at")
     List<ParkingTicket> findClosedTicketsBetween(LocalDateTime from, LocalDateTime toExclusive);
 
+    @SqlQuery("select count(*) > 0 from parking_ticket where slot_id = ?")
+    boolean existsTicketBySlotId(UUID slotId);
+
     class Mapper implements RowMapper<ParkingTicket> {
         @Override
         public ParkingTicket map(ResultSet rs, StatementContext ctx) throws SQLException {

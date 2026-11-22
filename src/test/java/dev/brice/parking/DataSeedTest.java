@@ -34,7 +34,7 @@ class DataSeedTest {
     }
 
     private DataSeed seed(String adminUser, String adminPassword) {
-        return new DataSeed(users, userService, new SlotService(slots), new TariffService(tariffs),
+        return new DataSeed(users, userService, new SlotService(slots, tickets), new TariffService(tariffs),
                 tickets, slots, tariffs, adminUser, adminPassword);
     }
 

@@ -9,31 +9,22 @@
     <p>Cada hora o fracción se cobra como hora completa. El mínimo es una hora.</p>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Vehículo</th><th class="num">Valor por hora</th></tr></thead>
+            <thead><tr><th>Vehículo</th><th class="num">Valor por hora</th><th>Actualizar</th></tr></thead>
             <tbody>
             <tr th:each="t : ${tariffs}">
                 <td th:text="${t.vehicleType.visualName}"></td>
                 <td class="num" th:text="'$' + ${#numbers.formatDecimal(t.hourlyRate, 1, 'POINT', 0, 'COMMA')}"></td>
+                <td>
+                    <form class="inline-form" th:action="@{/tariffs/{type}(type=${t.vehicleType})}" th:method="put">
+                        <input type="number" name="hourlyRate" th:value="${t.hourlyRate.toBigInteger()}" min="1" step="1" required
+                               th:aria-label="'Nuevo valor por hora para ' + ${t.vehicleType.visualName}">
+                        <button type="submit" class="compact">Guardar</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <section class="panel" aria-labelledby="set-tariff">
-        <h2 id="set-tariff">Cambiar tarifa</h2>
-        <form class="inline-form" th:action="@{/tariffs}" th:object="${form}" method="post">
-            <div class="field">
-                <label for="vehicleType">Vehículo</label>
-                <select id="vehicleType" th:field="*{vehicleType}">
-                    <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}"></option>
-                </select>
-            </div>
-            <div class="field">
-                <label for="hourlyRate">Valor por hora</label>
-                <input id="hourlyRate" th:field="*{hourlyRate}" type="number" min="1" step="1" required>
-            </div>
-            <button type="submit">Guardar tarifa</button>
-        </form>
-    </section>
 </main>
 </body>
 </html>

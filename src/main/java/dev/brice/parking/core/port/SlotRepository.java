@@ -14,5 +14,6 @@ public interface SlotRepository {
     Optional<ParkingSlot> findSlotByCode(String code);
     List<ParkingSlot> findAllSlots();
     List<ParkingSlot> findFreeSlotsByType(VehicleType vehicleType);
+    void deleteSlotById(UUID id);
 
 }

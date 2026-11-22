@@ -34,6 +34,11 @@ public class InMemorySlotRepository implements SlotRepository {
     }
 
     @Override
+    public void deleteSlotById(UUID id) {
+        slots.remove(id);
+    }
+
+    @Override
     public List<ParkingSlot> findFreeSlotsByType(VehicleType vehicleType) {
         return slots.values().stream()
                 .filter(slot -> slot.vehicleType() == vehicleType && slot.isFree())

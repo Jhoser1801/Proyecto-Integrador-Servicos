@@ -7,6 +7,7 @@ import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class H2UserRepository implements UserRepository {
 
@@ -23,6 +24,16 @@ public class H2UserRepository implements UserRepository {
     @Override
     public void saveUser(User user) {
         userDAO.upsertUser(user.id(), user.username(), user.passwordHash(), user.role());
+    }
+
+    @Override
+    public Optional<User> findUserById(UUID id) {
+        return userDAO.findUserById(id);
+    }
+
+    @Override
+    public void deleteUserById(UUID id) {
+        userDAO.deleteUserById(id);
     }
 
     @Override
