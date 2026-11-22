@@ -62,8 +62,8 @@ Como en `business-sales-project`, la base se puede mirar desde el navegador. Con
 | Campo | Valor |
 |---|---|
 | JDBC URL | `jdbc:h2:file:./data/parking` |
-| User name | `sa` |
-| Password | (vacía) |
+| User name | `parking` |
+| Password | `parking2026` |
 
 Se ven las tablas `PARKING_SLOT`, `PARKING_TICKET`, `TARIFF` y `APP_USER` y se pueden hacer consultas, por ejemplo `select * from parking_ticket`. La consola solo la abre el administrador con sesión iniciada, y H2 solo acepta conexiones desde el mismo equipo.
 
@@ -84,7 +84,7 @@ El operador registra entradas/salidas y ve tickets; el administrador además ges
 
 ## Base de datos
 
-H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`, sin clave). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `DataSeed` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `DataSeed` no se repite (tiene una guarda al inicio: si ya hay usuarios, no siembra).
+H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (con usuario y contraseña propios: `parking` / `parking2026`, definidos en `application.properties`). La primera vez que se ejecuta se crea la carpeta `data/` con `parking.mv.db`, las tablas se crean solas (`setupTables()` de cada repositorio) y `DataSeed` carga los datos de prueba. En los arranques siguientes la base ya existe: los datos registrados se conservan y `DataSeed` no se repite (tiene una guarda al inicio: si ya hay usuarios, no siembra).
 
 - **Empezar de cero:** cerrar la aplicación y borrar la carpeta `data/`.
 - **Una sola aplicación a la vez:** no se debe ejecutar dos copias con la misma carpeta `data/` (los puertos 8080 y 7070 tampoco lo permiten).
@@ -92,15 +92,28 @@ H2 con JDBI, guardada en un archivo: `jdbc:h2:file:./data/parking` (usuario `sa`
 - **Base temporal en memoria:** definir la variable de entorno `DB_URL` con `jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1` (en IntelliJ: *Run > Edit Configurations > Environment variables*).
 - **Sin base de datos:** cambiar los `new H2...Repository(jdbi)` por `new InMemory...Repository()`.
 
+### Usuario y contraseña de la base
+
+Como en `business-sales-project`, el usuario y la contraseña de la base están en `src/main/resources/application.properties`:
+
+```properties
+app.db.url=jdbc:h2:file:./data/parking
+app.db.username=parking
+app.db.password=parking2026
+```
+
+- H2 crea la base **la primera vez** con ese usuario y contraseña; después hay que usar los mismos. Si se cambian cuando la carpeta `data/` ya existe, la aplicación no arranca y avisa con un mensaje claro: se soluciona borrando la carpeta `data/` (se vuelve a crear con los datos de prueba).
+- La consola `/h2` pide ese mismo usuario y contraseña; con `sa` y contraseña vacía ya no entra.
+
 ### Variables de entorno (opcionales)
 
-La conexión y el administrador inicial se pueden cambiar sin tocar el código. Si no se definen, se usan los valores por defecto:
+Reemplazan lo que dice `application.properties` sin tocar el código (la variable tiene prioridad). Si no se definen, se usan los valores de `application.properties`:
 
 | Variable | Valor por defecto | Para qué sirve |
 |---|---|---|
 | `DB_URL` | `jdbc:h2:file:./data/parking` | Dónde está la base |
-| `DB_USER` | `sa` | Usuario de la base |
-| `DB_PASSWORD` | (vacía) | Contraseña de la base |
+| `DB_USER` | `parking` (`app.db.username`) | Usuario de la base |
+| `DB_PASSWORD` | `parking2026` (`app.db.password`) | Contraseña de la base |
 | `ADMIN_USER` | `admin` | Usuario del administrador que crea `DataSeed` (solo la primera vez) |
 | `ADMIN_PASSWORD` | `admin123` | Contraseña de ese administrador |
 

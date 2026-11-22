@@ -19,9 +19,13 @@ import dev.brice.parking.core.port.TicketRepository;
 import dev.brice.parking.core.port.UserRepository;
 
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.ConnectionException;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Clock;
+import java.util.Properties;
 
 // Raiz de composicion: aqui (y solo aqui) se eligen los adapters y se conectan con el core.
 public class Application {
@@ -31,10 +35,15 @@ public class Application {
         Clock clock = Clock.systemDefaultZone();
 
         // Base de datos H2 en un archivo (carpeta data/ del proyecto): los datos se conservan entre arranques.
-        // Se puede cambiar sin tocar el codigo con las variables de entorno DB_URL, DB_USER y DB_PASSWORD.
-        // Para una base temporal en memoria: DB_URL=jdbc:h2:mem:parkingdb;DB_CLOSE_DELAY=-1
-        Jdbi jdbi = Jdbi.create(env("DB_URL", "jdbc:h2:file:./data/parking"), env("DB_USER", "sa"), env("DB_PASSWORD", ""));
+        // La URL, el usuario y la contrasena salen de application.properties (app.db.*), igual que en
+        // business-sales-project, y se pueden reemplazar con las variables de entorno DB_URL, DB_USER y DB_PASSWORD.
+        // La primera vez, H2 crea la base con ese usuario y contrasena; despues hay que usar los mismos.
+        Jdbi jdbi = Jdbi.create(
+                setting("DB_URL", "app.db.url", "jdbc:h2:file:./data/parking"),
+                setting("DB_USER", "app.db.username", "parking"),
+                setting("DB_PASSWORD", "app.db.password", "parking2026"));
         jdbi.installPlugin(new SqlObjectPlugin());
+        checkDatabaseAccess(jdbi);
 
         // Adaptadores de salida (puertos). El orden importa: ticket tiene llave foranea a cupo.
         // Para volver a memoria: new InMemory...Repository() en lugar de new H2...Repository(jdbi)
@@ -61,6 +70,40 @@ public class Application {
 
         SpringUI springUI = new SpringUI(userService, slotService, tariffService, parkingService, reportService, passwordHasher);
         springUI.runServer(args);
+    }
+
+    // Orden de prioridad: variable de entorno, luego application.properties, luego el valor por defecto
+    private static String setting(String envName, String propertyName, String defaultValue) {
+        String fromEnv = env(envName, null);
+        if (fromEnv != null) {
+            return fromEnv;
+        }
+        String fromFile = loadProperties().getProperty(propertyName);
+        return fromFile == null || fromFile.isBlank() ? defaultValue : fromFile.trim();
+    }
+
+    private static Properties loadProperties() {
+        Properties properties = new Properties();
+        try (InputStream in = Application.class.getResourceAsStream("/application.properties")) {
+            if (in != null) {
+                properties.load(in);
+            }
+        } catch (IOException e) {
+            // sin archivo de propiedades se usan los valores por defecto
+        }
+        return properties;
+    }
+
+    // Si la base ya existia con otro usuario o contrasena, avisa claro en vez de mostrar un error largo de H2
+    private static void checkDatabaseAccess(Jdbi jdbi) {
+        try {
+            jdbi.useHandle(handle -> handle.execute("select 1"));
+        } catch (ConnectionException e) {
+            throw new IllegalStateException("No se pudo abrir la base de datos H2. Si la carpeta data/ ya existia, "
+                    + "fue creada con otro usuario o contrasena: usa los mismos (app.db.username y app.db.password en "
+                    + "application.properties) o borra la carpeta data/ para crear la base de nuevo. Causa: "
+                    + e.getCause().getMessage(), e);
+        }
     }
 
     private static String env(String name, String defaultValue) {

@@ -3,6 +3,7 @@ package dev.brice.parking.adapter.repository.h2;
 import dev.brice.parking.core.constant.SlotStatus;
 import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.entity.ParkingSlot;
+import org.jdbi.v3.core.ConnectionException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class H2FilePersistenceTest {
 
     private Jdbi open(Path dir) {
-        Jdbi jdbi = Jdbi.create("jdbc:h2:file:" + dir.resolve("parking").toAbsolutePath(), "sa", "");
+        return open(dir, "sa", "");
+    }
+
+    private Jdbi open(Path dir, String user, String password) {
+        Jdbi jdbi = Jdbi.create("jdbc:h2:file:" + dir.resolve("parking").toAbsolutePath(), user, password);
         jdbi.installPlugin(new SqlObjectPlugin());
         return jdbi;
     }
@@ -34,5 +39,16 @@ class H2FilePersistenceTest {
         assertEquals(slot.occupy(), reopened.findSlotById(slot.id()).orElseThrow());
         assertEquals(1, reopened.findAllSlots().size());
         assertTrue(Files.exists(dir.resolve("parking.mv.db")));
+    }
+
+    @Test
+    void databaseKeepsTheUserAndPasswordItWasCreatedWith(@TempDir Path dir) {
+        new H2SlotRepository(open(dir, "parking", "clave-segura")); // la primera conexion crea la base con ese usuario
+
+        // con el mismo usuario y contrasena abre
+        assertDoesNotThrow(() -> open(dir, "parking", "clave-segura").useHandle(handle -> handle.execute("select 1")));
+        // con otra contrasena, otro usuario o la clave vacia de "sa" no abre
+        assertThrows(ConnectionException.class, () -> open(dir, "parking", "otra").useHandle(handle -> handle.execute("select 1")));
+        assertThrows(ConnectionException.class, () -> open(dir, "sa", "").useHandle(handle -> handle.execute("select 1")));
     }
 }
