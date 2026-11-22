@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-// Requiere que la tabla parking_slot exista primero (llave foranea): crear H2SlotRepository antes
+
 public class H2TicketRepository implements TicketRepository {
 
     private final Jdbi jdbi;
