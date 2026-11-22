@@ -53,11 +53,11 @@ El sistema **no tiene ningún botón de login a la vista**: al personal se le da
 | `/cupos` | Cualquier persona, sin sesión | Cantidad de cupos libres (no muestra placas, horas ni códigos de cupo). Es también lo que se ve al abrir `/` sin sesión |
 | `/login` | Personal (se escribe la ruta) | Inicio de sesión. Es la única forma de llegar a las pantallas internas |
 | `/` | Con sesión | Mapa de cupos y registro de entradas |
-| `/h2` | Pública (H2 pide su usuario y contraseña) | Consola web de H2 para ver y consultar las tablas |
+| `/h2` | Solo el administrador | Consola web de H2 para ver y consultar las tablas |
 
 ### Consola web de H2 (`/h2`)
 
-Como en `business-sales-project`, la base se puede mirar desde el navegador. Abrir `http://localhost:8080/h2` e ingresar con:
+Como en `business-sales-project`, la base se puede mirar desde el navegador. Con sesión de administrador, abrir `http://localhost:8080/h2` e ingresar con:
 
 | Campo | Valor |
 |---|---|
@@ -65,7 +65,7 @@ Como en `business-sales-project`, la base se puede mirar desde el navegador. Abr
 | User name | `parking` |
 | Password | `parking2026` |
 
-Se ven las tablas `PARKING_SLOT`, `PARKING_TICKET`, `TARIFF` y `APP_USER` y se pueden hacer consultas, por ejemplo `select * from parking_ticket`. La ruta no pide el login de la aplicación: la protege el usuario y contraseña de la base, y H2 solo acepta conexiones desde el mismo equipo.
+Se ven las tablas `PARKING_SLOT`, `PARKING_TICKET`, `TARIFF` y `APP_USER` y se pueden hacer consultas, por ejemplo `select * from parking_ticket`. La consola solo la abre el administrador con sesión iniciada (si no, lleva al login), y H2 solo acepta conexiones desde el mismo equipo.
 
 
 El operador registra entradas/salidas y ve tickets; el administrador además gestiona cupos, tarifas y reportes.
