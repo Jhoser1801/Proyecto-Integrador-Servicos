@@ -1,7 +1,10 @@
 package dev.brice.parking.core.service;
 
+import dev.brice.parking.core.constant.VehicleType;
+import dev.brice.parking.core.dto.DailyRevenueDTO;
 import dev.brice.parking.core.dto.ReceiptDTO;
 import dev.brice.parking.core.dto.ReportDataDTO;
+import dev.brice.parking.core.dto.RevenueSummaryDTO;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
 import dev.brice.parking.core.port.SlotRepository;
@@ -11,11 +14,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 // Arma los datos de los reportes (que se consulta, que se suma, que se valida).
 // Convertirlos en PDF se hara despues, a traves del puerto ReportGateway.
 public class ReportService {
+    private static final int MAX_RANGE_DAYS = 366;
+
     private final TicketRepository ticketRepository;
     private final SlotRepository slotRepository;
 
@@ -40,6 +47,36 @@ public class ReportService {
         BigDecimal total = tickets.stream().map(ParkingTicket::totalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new ReportDataDTO("Reporte de ingresos", from, to, tickets, total);
+    }
+
+    // Totales del reporte: ganancia por dia (incluye los dias sin ingresos) y por tipo de vehiculo
+    public RevenueSummaryDTO buildRevenueSummary(LocalDate from, LocalDate to) {
+        ReportDataDTO report = buildRevenueReport(from, to);
+        if (from.plusDays(MAX_RANGE_DAYS).isBefore(to)) {
+            throw new IllegalArgumentException("El rango del reporte no puede superar " + MAX_RANGE_DAYS + " dias");
+        }
+
+        Map<LocalDate, BigDecimal> perDay = new TreeMap<>();
+        for (LocalDate day = from; !day.isAfter(to); day = day.plusDays(1)) {
+            perDay.put(day, BigDecimal.ZERO);
+        }
+        BigDecimal cars = BigDecimal.ZERO;
+        BigDecimal motorcycles = BigDecimal.ZERO;
+        for (ParkingTicket ticket : report.tickets()) {
+            perDay.merge(ticket.exitAt().toLocalDate(), ticket.totalAmount(), BigDecimal::add);
+            if (ticket.vehicleType() == VehicleType.CAR) {
+                cars = cars.add(ticket.totalAmount());
+            } else {
+                motorcycles = motorcycles.add(ticket.totalAmount());
+            }
+        }
+
+        BigDecimal best = perDay.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        List<DailyRevenueDTO> days = perDay.entrySet().stream()
+                .map(entry -> new DailyRevenueDTO(entry.getKey(), entry.getValue(), best.signum() == 0 ? 0
+                        : entry.getValue().multiply(BigDecimal.valueOf(100)).divide(best, 0, java.math.RoundingMode.HALF_UP).intValue()))
+                .toList();
+        return new RevenueSummaryDTO(from, to, report.totalRevenue(), report.tickets().size(), cars, motorcycles, days);
     }
 
     // Comprobante de salida: solo de tickets cerrados

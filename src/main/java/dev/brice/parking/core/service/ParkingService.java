@@ -1,5 +1,7 @@
 package dev.brice.parking.core.service;
 
+import dev.brice.parking.core.constant.TicketStatus;
+import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.entity.ParkingTicket;
@@ -10,6 +12,7 @@ import dev.brice.parking.core.port.TicketRepository;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -86,6 +89,21 @@ public class ParkingService {
     public List<ParkingTicket> findAllTickets() {
         return ticketRepository.findAllTickets().stream()
                 .sorted(Comparator.comparing(ParkingTicket::entryAt).reversed())
+                .toList();
+    }
+
+    // Filtros del historial: cualquier filtro en null se ignora. Las fechas comparan el dia de entrada
+    public List<ParkingTicket> searchTickets(String plate, VehicleType vehicleType, TicketStatus status, LocalDate from, LocalDate to) {
+        if (from != null && to != null && to.isBefore(from)) {
+            throw new IllegalArgumentException("La fecha final no puede ser anterior a la inicial");
+        }
+        String needle = plate == null ? "" : plate.trim().toUpperCase();
+        return findAllTickets().stream()
+                .filter(ticket -> needle.isEmpty() || ticket.plate().contains(needle))
+                .filter(ticket -> vehicleType == null || ticket.vehicleType() == vehicleType)
+                .filter(ticket -> status == null || ticket.status() == status)
+                .filter(ticket -> from == null || !ticket.entryAt().toLocalDate().isBefore(from))
+                .filter(ticket -> to == null || !ticket.entryAt().toLocalDate().isAfter(to))
                 .toList();
     }
 

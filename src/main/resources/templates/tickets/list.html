@@ -1,36 +1,93 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Tickets')}"></head>
+<head th:replace="~{fragments/layout :: head('Historial de tickets')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main>
-    <div class="toolbar">
-        <h1>Tickets</h1>
-        <a class="btn" th:href="@{/#entrada}">Registrar entrada</a>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('tickets')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Historial de tickets', 'Entradas y salidas registradas')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+
+            <section class="stats" aria-label="Resumen de tickets">
+                <div class="stat"><span>Total de tickets</span><strong th:text="${totalTickets}">148</strong></div>
+                <div class="stat stat--primary"><span>Vehículos dentro</span><strong th:text="${openTickets}">20</strong></div>
+                <div class="stat"><span>Tickets cerrados</span><strong th:text="${closedTickets}">128</strong></div>
+                <div class="stat stat--success"><span>Ingresos totales</span><strong><span th:replace="~{fragments/layout :: money(${totalRevenue})}">$ 0 COP</span></strong></div>
+            </section>
+
+            <!-- Los filtros son un formulario GET normal: el servidor filtra y la dirección conserva la búsqueda -->
+            <form class="card filters" th:action="@{/tickets}" method="get" aria-label="Filtros de búsqueda">
+                <label class="field">
+                    <span>Buscar por placa</span>
+                    <input class="mono" type="search" name="q" th:value="${q}" placeholder="ABC123" maxlength="6" autocomplete="off">
+                </label>
+                <label class="field">
+                    <span>Tipo de vehículo</span>
+                    <select name="type">
+                        <option value="">Todos</option>
+                        <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}" th:selected="${t == type}"></option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Estado</span>
+                    <select name="status">
+                        <option value="">Todos</option>
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.visualName}" th:selected="${s == status}"></option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Entrada desde</span>
+                    <input type="date" name="from" th:value="${from}">
+                </label>
+                <label class="field">
+                    <span>Entrada hasta</span>
+                    <input type="date" name="to" th:value="${to}">
+                </label>
+                <div class="btn-row">
+                    <button class="btn" type="submit"><span class="icon" aria-hidden="true">search</span>Filtrar</button>
+                    <a class="btn btn--secondary" th:if="${filtered}" th:href="@{/tickets}">Limpiar</a>
+                </div>
+            </form>
+
+            <section class="card card--flush" aria-label="Listado de tickets">
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Placa</th>
+                            <th scope="col">Tipo de vehículo</th>
+                            <th scope="col">Hora de entrada</th>
+                            <th scope="col">Hora de salida</th>
+                            <th scope="col" class="num">Total cobrado</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col" class="actions">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="t : ${tickets}">
+                            <td class="mono" th:text="${t.plate}">ABC123</td>
+                            <td th:text="${t.vehicleType.visualName}">Carro</td>
+                            <td class="mono" th:text="${#temporals.format(t.entryAt, 'dd/MM/yyyy HH:mm')}">22/11/2026 08:00</td>
+                            <td class="mono" th:text="${t.exitAt != null} ? ${#temporals.format(t.exitAt, 'dd/MM/yyyy HH:mm')} : 'Sigue dentro'">-</td>
+                            <td class="num mono"><th:block th:if="${t.totalAmount != null}"><span th:replace="~{fragments/layout :: money(${t.totalAmount})}"></span></th:block><span th:unless="${t.totalAmount != null}">-</span></td>
+                            <td><span class="badge" th:classappend="${t.open} ? 'badge--busy' : 'badge--free'" th:text="${t.status.visualName}">Dentro</span></td>
+                            <td class="actions">
+                                <form th:if="${t.open}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" th:method="put">
+                                    <button class="btn btn--sm" type="submit">Registrar salida</button>
+                                </form>
+                                <a th:unless="${t.open}" class="btn btn--secondary btn--sm" th:href="@{/tickets/{id}(id=${t.id})}">Ver comprobante</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(tickets)}">
+                            <td colspan="7" class="empty">No se encontraron tickets con los filtros seleccionados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-    <div th:replace="~{fragments/layout :: messages}"></div>
-    <p class="empty" th:if="${tickets.isEmpty()}">Todavía no hay tickets. Registra la primera entrada desde Cupos.</p>
-    <div class="table-wrap" th:unless="${tickets.isEmpty()}">
-        <table>
-            <thead><tr><th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
-            <tbody>
-            <tr th:each="t : ${tickets}">
-                <td class="plate" th:text="${t.plate}"></td>
-                <td th:text="${t.vehicleType.visualName}"></td>
-                <td th:text="${#temporals.format(t.entryAt, 'dd/MM/yyyy HH:mm')}"></td>
-                <td th:text="${t.exitAt != null} ? ${#temporals.format(t.exitAt, 'dd/MM/yyyy HH:mm')} : 'Sigue dentro'"></td>
-                <td class="num" th:text="${t.totalAmount != null} ? '$' + ${#numbers.formatDecimal(t.totalAmount, 1, 'POINT', 0, 'COMMA')} : '-'"></td>
-                <td><span class="state" th:classappend="${t.status.name() == 'OPEN'} ? 'open'" th:text="${t.status.visualName}"></span></td>
-                <td>
-                    <form th:if="${t.status.name() == 'OPEN'}" th:action="@{/tickets/{id}/check-out(id=${t.id})}" th:method="put" style="margin:0">
-                        <button class="compact" type="submit">Registrar salida</button>
-                    </form>
-                    <a th:unless="${t.status.name() == 'OPEN'}" th:href="@{/tickets/{id}(id=${t.id})}">Ver comprobante</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</main>
+</div>
 </body>
 </html>

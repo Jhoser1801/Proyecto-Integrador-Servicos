@@ -25,6 +25,46 @@ src/main/java/dev/brice/parking/
         └── spring/           SpringUI + SpringConfig + controller/: vistas con Spring + Thymeleaf + login
 ```
 
+## Interfaz web (Thymeleaf + un solo CSS)
+
+Estilo ParqueoPro: barra lateral oscura, ciruela como color de acción y neutros claros. **No usa JavaScript**: todo lo
+que parece dinámico lo resuelve el servidor o el navegador solo.
+
+```
+src/main/resources/
+├── static/css/app.css        única hoja de estilos, con bloques: variables, base, estructura, componentes, pantallas
+└── templates/
+    ├── fragments/layout.html piezas compartidas: head, sidebar, topbar, messages, money, publicbar, errorpage
+    ├── fragments/bays.html   una zona del plano de cupos (se usa para carros y para motos)
+    ├── index.html            mapa de cupos + registrar entrada + detalle del cupo
+    ├── tickets/              historial con filtros y comprobante
+    ├── slots/ tariffs/ users/ reports/   pantallas del administrador
+    ├── public/slots.html     disponibilidad pública
+    ├── login.html            inicio de sesión (solo por ruta)
+    └── error/                400, 403, 404, 500 y "función no disponible"
+```
+
+**CSS reutilizable:** las pantallas se arman con las mismas piezas (`.card`, `.stat`, `.btn` y sus variantes, `.badge`,
+`.field`, `.table`, `.alert`, `.modal`, `.facts`, `.progress`). Los colores y medidas están como variables al inicio de
+`app.css`; cambiar la paleta es editar ese bloque.
+
+**Sin JavaScript, cómo se resuelve cada cosa:**
+
+| Función | Cómo |
+|---|---|
+| Filtros del historial (placa, tipo, estado, fechas) | Formulario `GET /tickets?q=&type=&status=&from=&to=`; el servidor filtra (`ParkingService.searchTickets`) |
+| Elegir un cupo en el plano | Cada cupo es un enlace `/?slot=A1` y el servidor dibuja el detalle |
+| Confirmar la salida | `/?slot=A1&confirmar` dibuja la ventana de confirmación; el botón envía un `PUT` |
+| Ventanas de crear y editar (cupos y usuarios) | `?crear` y `?editar=<id>`: el servidor dibuja la ventana |
+| Editar una tarifa | `<details>` del navegador abre y cierra el formulario |
+| Elegir Carro o Moto | Botones de radio con estilo (`:checked`) |
+| Menú lateral en el celular | Casilla oculta (`#nav-toggle`) y la etiqueta del botón de menú |
+| Barras del reporte | La altura sale de la variable CSS `--value`, calculada por el servidor (`ReportService.buildRevenueSummary`) |
+
+Las fuentes (Alata, Instrument Sans, Red Hat Mono) y los iconos (Material Symbols) se cargan de Google Fonts: se
+necesita internet para verlos bien. El mapa de cupos muestra solo texto (tipo, placa y hora), sin imágenes de vehículos.
+Para imprimir un comprobante se usa Ctrl+P (la hoja de estilos oculta el menú al imprimir).
+
 Reglas de negocio principales (en `core`): un vehículo no puede entrar dos veces, un cupo ocupado no se
 asigna, la salida cierra el ticket y libera el cupo, y el cobro es por hora o fracción (mínimo una hora).
 

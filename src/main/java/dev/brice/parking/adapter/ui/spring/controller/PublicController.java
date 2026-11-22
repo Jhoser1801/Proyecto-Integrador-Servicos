@@ -15,6 +15,21 @@ import java.util.List;
 // A la vista nunca llegan placas, horas, tickets ni los codigos de los cupos.
 @Controller
 public class PublicController {
+    // Cantidad libre y total de un tipo de vehiculo, con el estado que se muestra a la gente
+    public record Availability(String title, long free, long total) {
+        public int percent() {
+            return total == 0 ? 0 : (int) (free * 100 / total);
+        }
+
+        public String label() {
+            return free == 0 ? "Lleno" : percent() <= 20 ? "Pocos cupos" : "Disponible";
+        }
+
+        public String tone() {
+            return free == 0 ? "busy" : percent() <= 20 ? "warn" : "free";
+        }
+    }
+
     private final SlotService slots;
 
     public PublicController(SlotService slots) {
@@ -26,10 +41,10 @@ public class PublicController {
         response.setHeader("Refresh", "30"); // el navegador recarga la pagina solo
         List<ParkingSlot> all = slots.findAllSlots();
 
-        model.addAttribute("freeCars", countFree(all, VehicleType.CAR));
-        model.addAttribute("totalCars", countAll(all, VehicleType.CAR));
-        model.addAttribute("freeMotorcycles", countFree(all, VehicleType.MOTORCYCLE));
-        model.addAttribute("totalMotorcycles", countAll(all, VehicleType.MOTORCYCLE));
+        Availability cars = new Availability("Carros", countFree(all, VehicleType.CAR), countAll(all, VehicleType.CAR));
+        Availability motorcycles = new Availability("Motos", countFree(all, VehicleType.MOTORCYCLE), countAll(all, VehicleType.MOTORCYCLE));
+        model.addAttribute("availabilities", List.of(cars, motorcycles));
+        model.addAttribute("totalSlots", all.size());
         return "public/slots";
     }
 

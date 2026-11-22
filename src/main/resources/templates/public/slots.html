@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Cupos disponibles')}"></head>
-<body>
-<header th:replace="~{fragments/layout :: publicnav}"></header>
-<main>
-    <h1>Cupos disponibles</h1>
-    <p>Se actualiza solo cada 30 segundos.</p>
-    <div class="avail">
-        <section class="panel" aria-labelledby="cars-title">
-            <h2 id="cars-title">Carros</h2>
-            <p class="avail-count" th:classappend="${freeCars == 0} ? 'none'">
-                <strong th:text="${freeCars}">0</strong>
-                <span th:text="${freeCars == 1} ? 'cupo libre' : 'cupos libres'">cupos libres</span>
-            </p>
-            <p class="hint" th:text="${freeCars == 0} ? 'Por ahora no hay cupos libres para carros.' : 'De ' + ${totalCars} + ' cupos para carros.'"></p>
-        </section>
-        <section class="panel" aria-labelledby="moto-title">
-            <h2 id="moto-title">Motos</h2>
-            <p class="avail-count" th:classappend="${freeMotorcycles == 0} ? 'none'">
-                <strong th:text="${freeMotorcycles}">0</strong>
-                <span th:text="${freeMotorcycles == 1} ? 'cupo libre' : 'cupos libres'">cupos libres</span>
-            </p>
-            <p class="hint" th:text="${freeMotorcycles == 0} ? 'Por ahora no hay cupos libres para motos.' : 'De ' + ${totalMotorcycles} + ' cupos para motos.'"></p>
-        </section>
-    </div>
+<head th:replace="~{fragments/layout :: head('Disponibilidad')}"></head>
+<body class="public">
+<header th:replace="~{fragments/layout :: publicbar('Información pública en tiempo real')}"></header>
+<main class="public__main">
+    <section class="hero">
+        <h1>Disponibilidad de parqueadero</h1>
+        <p>Consulta cuántos cupos libres hay para carros y motos antes de llegar.</p>
+    </section>
+
+    <!-- Solo cantidades: nunca placas, horas ni códigos de cupo. Cada tarjeta usa la misma estructura -->
+    <section class="availability" aria-label="Disponibilidad por tipo de vehículo">
+        <article class="card" th:each="a : ${availabilities}">
+            <header class="card__head">
+                <h2 th:text="${a.title}">Carros</h2>
+                <span class="badge" th:classappend="'badge--' + ${a.tone}" th:text="${a.label}">Disponible</span>
+            </header>
+            <div class="availability__count" th:classappend="'availability__count--' + ${a.tone}">
+                <strong th:text="${a.free}">12</strong>
+                <span>cupos disponibles de <b th:text="${a.total}">20</b> totales</span>
+            </div>
+            <div>
+                <div class="share__head"><span>Nivel de disponibilidad</span><span th:text="${a.percent} + '% libre'">60% libre</span></div>
+                <div class="progress" th:classappend="${a.tone == 'free'} ? '' : 'progress--' + ${a.tone}" role="progressbar"
+                     aria-valuemin="0" aria-valuemax="100" th:attr="aria-valuenow=${a.percent}">
+                    <span th:style="'--value:' + ${a.percent}"></span>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <p class="alert alert--info" role="status"><span class="icon" aria-hidden="true">sync</span>La disponibilidad se actualiza sola cada 30 segundos.</p>
 </main>
+<footer class="public__foot">
+    <span>Parqueadero · información de disponibilidad</span>
+    <span>Capacidad total: <span th:text="${totalSlots}">50</span> cupos</span>
+</footer>
 </body>
 </html>

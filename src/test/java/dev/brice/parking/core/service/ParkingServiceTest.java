@@ -58,6 +58,22 @@ class ParkingServiceTest {
     }
 
     @Test
+    void searchTicketsFiltersByPlateTypeStatusAndEntryDate() {
+        ParkingTicket closed = parking.checkIn(new CheckInDTO("ABC123", VehicleType.CAR));
+        parking.checkOut(closed.id());
+        parking.checkIn(new CheckInDTO("XYZ987", VehicleType.CAR));
+
+        assertEquals(2, parking.searchTickets(null, null, null, null, null).size());
+        assertEquals(1, parking.searchTickets("abc", null, null, null, null).size());                 // placa parcial, sin importar mayusculas
+        assertEquals(1, parking.searchTickets(null, VehicleType.CAR, TicketStatus.OPEN, null, null).size());
+        assertEquals(0, parking.searchTickets(null, VehicleType.MOTORCYCLE, null, null, null).size());
+        assertEquals(2, parking.searchTickets(null, null, null, java.time.LocalDate.of(2026, 11, 10), java.time.LocalDate.of(2026, 11, 10)).size());
+        assertEquals(0, parking.searchTickets(null, null, null, java.time.LocalDate.of(2026, 11, 11), null).size());
+        assertThrows(IllegalArgumentException.class,
+                () -> parking.searchTickets(null, null, null, java.time.LocalDate.of(2026, 11, 12), java.time.LocalDate.of(2026, 11, 10)));
+    }
+
+    @Test
     void failsWhenNoFreeSlots() {
         parking.checkIn(new CheckInDTO("AAA111", VehicleType.CAR));
         parking.checkIn(new CheckInDTO("BBB222", VehicleType.CAR));

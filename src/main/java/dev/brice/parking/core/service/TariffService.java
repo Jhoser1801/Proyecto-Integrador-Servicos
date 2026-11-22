@@ -1,10 +1,12 @@
 package dev.brice.parking.core.service;
 
+import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.TariffDTO;
 import dev.brice.parking.core.entity.Tariff;
 import dev.brice.parking.core.port.TariffRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TariffService {
@@ -21,6 +23,10 @@ public class TariffService {
         Tariff tariff = request.toEntity(id);
         repository.saveTariff(tariff);
         return tariff;
+    }
+
+    public Optional<Tariff> findTariffByVehicleType(VehicleType vehicleType) {
+        return repository.findTariffByVehicleType(vehicleType);
     }
 
     public List<Tariff> findAllTariffs() {

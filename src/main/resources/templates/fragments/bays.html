@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Una zona del plano (carros o motos). Se usa dos veces en el mapa: solo cambian los datos que recibe. -->
+<section class="zone" th:fragment="zone(title, lane, bays, free, selected)" th:attr="aria-label='Zona de ' + ${#strings.toLowerCase(title)}">
+    <div class="zone__head">
+        <h3 th:text="${title}">Carros</h3>
+        <span class="mono small muted"><span th:text="${free}">0</span> libres / <span th:text="${#lists.size(bays) - free}">0</span> ocupados</span>
+    </div>
+    <div class="zone__floor">
+        <div class="lane" aria-hidden="true" th:text="${lane}">ENTRADA</div>
+        <div class="bays">
+            <a th:each="b : ${bays}" class="bay"
+               th:classappend="${b.busy ? 'bay--busy' : 'bay--free'} + (${selected != null and selected.slot.id == b.slot.id} ? ' bay--selected' : '')"
+               th:href="@{/(slot=${b.slot.code})}" th:attr="aria-label='Cupo ' + ${b.slot.code}">
+                <span class="bay__top">
+                    <span class="bay__code" th:text="${b.slot.code}">A1</span>
+                    <span class="bay__kind" th:text="${b.slot.vehicleType.visualName}">Carro</span>
+                </span>
+                <th:block th:if="${b.busy}">
+                    <span class="bay__plate" th:text="${b.ticket.plate}">ABC123</span>
+                    <span class="bay__time" th:text="'desde ' + ${#temporals.format(b.ticket.entryAt, 'HH:mm')}">desde 08:00</span>
+                </th:block>
+                <span class="bay__state" th:unless="${b.busy}">Libre</span>
+            </a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

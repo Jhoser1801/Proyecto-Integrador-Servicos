@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Esta página no existe')}"></head>
-<body>
-<main class="center-screen">
-    <div class="sign">
-        <p class="sign-big">404</p>
-        <h1>Esta página no existe</h1>
-        <p>Revisa la dirección o vuelve a los cupos.</p>
-        <p th:if="${message}" th:text="${message}"></p>
-        <a class="btn" th:href="@{/}">Volver a los cupos</a>
-    </div>
-</main>
+<head th:replace="~{fragments/layout :: head('Página no encontrada')}"></head>
+<body class="public">
+<header th:replace="~{fragments/layout :: publicbar('Sistema de gestión de parqueaderos')}"></header>
+<main th:replace="~{fragments/layout :: errorpage('404', 'Página no encontrada', 'La ruta que buscas no existe o fue movida. Regresa al inicio para continuar.')}"></main>
 </body>
 </html>

@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('No se pudo completar la solicitud')}"></head>
-<body>
-<main class="center-screen">
-    <div class="sign">
-        <p class="sign-big">!</p>
-        <h1>No se pudo completar la solicitud</h1>
-        <p>Vuelve a intentarlo.</p>
-        <p th:if="${message}" th:text="${message}"></p>
-        <a class="btn" th:href="@{/}">Volver a los cupos</a>
-    </div>
-</main>
+<body class="public">
+<header th:replace="~{fragments/layout :: publicbar('Sistema de gestión de parqueaderos')}"></header>
+<main th:replace="~{fragments/layout :: errorpage('!', 'No se pudo completar la solicitud', 'Vuelve a intentarlo.')}"></main>
 </body>
 </html>

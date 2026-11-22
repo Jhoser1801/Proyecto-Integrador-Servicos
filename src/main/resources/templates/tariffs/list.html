@@ -2,29 +2,45 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Tarifas')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main class="stack">
-    <h1>Tarifas por hora</h1>
-    <div th:replace="~{fragments/layout :: messages}"></div>
-    <p>Cada hora o fracción se cobra como hora completa. El mínimo es una hora.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Vehículo</th><th class="num">Valor por hora</th><th>Actualizar</th></tr></thead>
-            <tbody>
-            <tr th:each="t : ${tariffs}">
-                <td th:text="${t.vehicleType.visualName}"></td>
-                <td class="num" th:text="'$' + ${#numbers.formatDecimal(t.hourlyRate, 1, 'POINT', 0, 'COMMA')}"></td>
-                <td>
-                    <form class="inline-form" th:action="@{/tariffs/{type}(type=${t.vehicleType})}" th:method="put">
-                        <input type="number" name="hourlyRate" th:value="${t.hourlyRate.toBigInteger()}" min="1" step="1" required
-                               th:aria-label="'Nuevo valor por hora para ' + ${t.vehicleType.visualName}">
-                        <button type="submit" class="compact">Guardar</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('tariffs')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Gestión de tarifas', 'Valor por hora de cada tipo de vehículo')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+
+            <section class="alert alert--info" aria-label="Regla de cobro vigente">
+                <span class="icon" aria-hidden="true">info</span>
+                <div><strong>Regla de cobro</strong><br>Se cobra por hora o fracción como hora completa, con un mínimo de una hora.</div>
+            </section>
+
+            <section class="tariffs" aria-label="Tarifas por tipo de vehículo">
+                <article class="card" th:each="t : ${tariffs}">
+                    <header class="card__head">
+                        <div>
+                            <h2 th:text="'Tarifa de ' + ${#strings.toLowerCase(t.vehicleType.visualName)} + 's'">Tarifa de carros</h2>
+                            <p>Moneda: COP</p>
+                        </div>
+                    </header>
+                    <div class="price">
+                        <span class="small muted">Valor actual por hora</span>
+                        <strong><span th:replace="~{fragments/layout :: money(${t.hourlyRate})}">$ 4.500 COP</span></strong>
+                    </div>
+                    <!-- <details> abre y cierra el formulario sin JavaScript -->
+                    <details class="disclosure">
+                        <summary class="btn btn--secondary"><span class="icon" aria-hidden="true">edit</span>Editar tarifa</summary>
+                        <form class="form" th:action="@{/tariffs/{type}(type=${t.vehicleType})}" th:method="put">
+                            <label class="field">
+                                <span>Nuevo valor por hora (COP)</span>
+                                <input type="number" name="hourlyRate" min="100" step="100" required th:value="${t.hourlyRate.toBigInteger()}">
+                            </label>
+                            <button class="btn" type="submit">Guardar cambios</button>
+                        </form>
+                    </details>
+                </article>
+            </section>
+        </main>
     </div>
-</main>
+</div>
 </body>
 </html>

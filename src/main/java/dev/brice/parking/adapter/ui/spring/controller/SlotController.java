@@ -1,7 +1,9 @@
 package dev.brice.parking.adapter.ui.spring.controller;
 
 import dev.brice.parking.core.constant.VehicleType;
+import dev.brice.parking.core.constant.SlotStatus;
 import dev.brice.parking.core.dto.SlotDTO;
+import dev.brice.parking.core.entity.ParkingSlot;
 import dev.brice.parking.core.service.SlotService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -25,11 +29,19 @@ public class SlotController {
         this.slots = slots;
     }
 
+    // ?crear abre la ventana de cupo nuevo y ?editar=<id> la de edicion (la dibuja el servidor, sin JavaScript)
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("slots", slots.findAllSlots());
+    public String list(@RequestParam(required = false) String crear,
+                       @RequestParam(required = false) UUID editar, Model model) {
+        List<ParkingSlot> all = slots.findAllSlots();
+        model.addAttribute("slots", all);
         model.addAttribute("vehicleTypes", VehicleType.values());
-        model.addAttribute("form", new SlotDTO("", VehicleType.CAR));
+        model.addAttribute("totalSlots", all.size());
+        model.addAttribute("carSlots", all.stream().filter(s -> s.vehicleType() == VehicleType.CAR).count());
+        model.addAttribute("motorcycleSlots", all.stream().filter(s -> s.vehicleType() == VehicleType.MOTORCYCLE).count());
+        model.addAttribute("freeSlots", all.stream().filter(s -> s.status() == SlotStatus.FREE).count());
+        model.addAttribute("showCreate", crear != null);
+        model.addAttribute("editing", editar == null ? null : slots.findSlotById(editar).orElse(null));
         return "slots/list";
     }
 

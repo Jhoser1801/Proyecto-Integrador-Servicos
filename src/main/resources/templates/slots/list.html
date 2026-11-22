@@ -2,54 +2,78 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Administrar cupos')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main class="stack">
-    <h1>Administrar cupos</h1>
-    <div th:replace="~{fragments/layout :: messages}"></div>
-    <section class="panel" aria-labelledby="new-slot">
-        <h2 id="new-slot">Crear cupo</h2>
-        <form class="inline-form" th:action="@{/slots}" th:object="${form}" method="post">
-            <div class="field">
-                <label for="code">Código</label>
-                <input id="code" th:field="*{code}" maxlength="10" placeholder="A6" required>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('slots')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Administrar cupos', 'Crear, editar y eliminar cupos')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+
+            <section class="stats" aria-label="Resumen de cupos">
+                <div class="stat"><span>Total de cupos</span><strong th:text="${totalSlots}">50</strong></div>
+                <div class="stat"><span>Cupos para carros</span><strong th:text="${carSlots}">20</strong></div>
+                <div class="stat"><span>Cupos para motos</span><strong th:text="${motorcycleSlots}">30</strong></div>
+                <div class="stat stat--success"><span>Cupos disponibles</span><strong th:text="${freeSlots}">30</strong></div>
+            </section>
+
+            <div class="toolbar">
+                <p class="muted">Solo se pueden editar o eliminar cupos libres, y solo se eliminan los que nunca se usaron, para conservar el historial.</p>
+                <a class="btn" th:href="@{/slots(crear)}"><span class="icon" aria-hidden="true">add</span>Crear cupo</a>
             </div>
-            <div class="field">
-                <label for="vehicleType">Tipo de vehículo</label>
-                <select id="vehicleType" th:field="*{vehicleType}">
-                    <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}"></option>
-                </select>
-            </div>
-            <button type="submit">Crear cupo</button>
-        </form>
-    </section>
-    <p>Un cupo ocupado no se puede editar ni eliminar. Un cupo que ya tuvo tickets tampoco se elimina (se conserva el historial) ni cambia de tipo de vehículo.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Estado</th><th>Editar cupo</th><th>Eliminar</th></tr></thead>
-            <tbody>
-            <tr th:each="s : ${slots}">
-                <td><span class="state" th:classappend="${s.status.name() == 'OCCUPIED'} ? 'open'" th:text="${s.status.visualName}"></span></td>
-                <td>
-                    <form class="inline-form" th:action="@{/slots/{id}(id=${s.id})}" th:method="put">
-                        <input name="code" th:value="${s.code}" maxlength="10" required class="plate"
-                               th:disabled="${!s.free}" th:aria-label="'Código del cupo ' + ${s.code}">
-                        <select name="vehicleType" th:disabled="${!s.free}" th:aria-label="'Tipo del cupo ' + ${s.code}">
-                            <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}"
-                                    th:selected="${t == s.vehicleType}"></option>
-                        </select>
-                        <button type="submit" class="compact" th:disabled="${!s.free}">Guardar</button>
-                    </form>
-                </td>
-                <td>
-                    <form th:action="@{/slots/{id}(id=${s.id})}" th:method="delete"
-                          th:attr="onsubmit=|return confirm('¿Eliminar el cupo ${s.code}?')|">
-                        <button type="submit" class="compact danger" th:disabled="${!s.free}">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+            <section class="card card--flush" aria-label="Tabla de cupos">
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr><th scope="col">Código del cupo</th><th scope="col">Tipo de vehículo</th><th scope="col">Estado</th><th scope="col" class="actions">Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="s : ${slots}">
+                            <td class="mono" th:text="${s.code}">A1</td>
+                            <td th:text="${s.vehicleType.visualName}">Carro</td>
+                            <td><span class="badge" th:classappend="${s.free} ? 'badge--free' : 'badge--busy'" th:text="${s.status.visualName}">Libre</span></td>
+                            <td class="actions">
+                                <div class="btn-row btn-row--end">
+                                    <a class="btn btn--secondary btn--sm" th:classappend="${!s.free} ? 'is-disabled'" th:href="@{/slots(editar=${s.id})}">Editar</a>
+                                    <form th:action="@{/slots/{id}(id=${s.id})}" th:method="delete">
+                                        <button class="btn btn--danger btn--sm" type="submit" th:disabled="${!s.free}">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-</main>
+</div>
+
+<!-- Ventana para crear o editar un cupo: la dibuja el servidor con ?crear o ?editar=<id> -->
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="slot-title" th:if="${showCreate or editing != null}">
+    <a class="modal__backdrop" th:href="@{/slots}" aria-label="Cerrar"></a>
+    <div class="modal__panel">
+        <div class="modal__head">
+            <h2 id="slot-title" th:text="${editing != null} ? 'Editar cupo' : 'Crear nuevo cupo'">Crear nuevo cupo</h2>
+            <a class="btn btn--secondary btn--sm" th:href="@{/slots}" aria-label="Cerrar"><span class="icon sm" aria-hidden="true">close</span></a>
+        </div>
+        <form class="form" th:action="${editing != null} ? @{/slots/{id}(id=${editing.id})} : @{/slots}" th:method="${editing != null} ? 'put' : 'post'">
+            <label class="field">
+                <span>Código del cupo</span>
+                <input class="mono" name="code" maxlength="10" required placeholder="A21" th:value="${editing != null} ? ${editing.code}" autofocus>
+            </label>
+            <label class="field">
+                <span>Tipo de vehículo</span>
+                <select name="vehicleType">
+                    <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.visualName}" th:selected="${editing != null and editing.vehicleType == t}"></option>
+                </select>
+            </label>
+            <div class="btn-row">
+                <a class="btn btn--secondary" th:href="@{/slots}">Cancelar</a>
+                <button class="btn" type="submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

@@ -1,28 +1,52 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Ticket')}"></head>
+<head th:replace="~{fragments/layout :: head('Comprobante de ticket')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main>
-    <article class="receipt">
-        <h1 th:text="${ticket.status.name() == 'CLOSED'} ? 'Comprobante de salida' : 'Ticket de entrada'">Comprobante</h1>
-        <dl>
-            <div class="row"><dt>Placa</dt><dd class="plate" th:text="${ticket.plate}"></dd></div>
-            <div class="row"><dt>Vehículo</dt><dd th:text="${ticket.vehicleType.visualName}"></dd></div>
-            <div class="row"><dt>Cupo</dt><dd th:text="${slot != null} ? ${slot.code} : '-'"></dd></div>
-            <div class="row"><dt>Entrada</dt><dd th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}"></dd></div>
-            <div class="row" th:if="${ticket.exitAt != null}"><dt>Salida</dt><dd th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}"></dd></div>
-        </dl>
-        <div class="total" th:if="${ticket.totalAmount != null}">
-            <span>Total a pagar</span>
-            <strong th:text="'$' + ${#numbers.formatDecimal(ticket.totalAmount, 1, 'POINT', 0, 'COMMA')}"></strong>
-        </div>
-        <p th:if="${ticket.status.name() == 'OPEN'}" style="margin:1rem 0 0">El vehículo sigue dentro del parqueadero.</p>
-    </article>
-    <div class="actions">
-        <a class="btn" th:if="${ticket.status.name() == 'CLOSED'}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}">Descargar comprobante en PDF</a>
-        <a class="btn quiet" th:href="@{/tickets}">Volver a tickets</a>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('tickets')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Comprobante de ticket', 'Liquidación del parqueadero')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+            <article class="card receipt">
+                <header class="receipt__head">
+                    <div>
+                        <h2>Parqueadero</h2>
+                        <p class="muted" th:text="${ticket.open} ? 'Ticket de entrada' : 'Comprobante de salida'">Comprobante de salida</p>
+                    </div>
+                    <div>
+                        <span class="small muted">Número de ticket</span><br>
+                        <strong class="mono" th:text="'#' + ${ticket.id.toString().substring(0, 8).toUpperCase()}">#A1B2C3D4</strong>
+                    </div>
+                </header>
+
+                <dl class="receipt__rows">
+                    <div class="receipt__row"><dt>Placa del vehículo</dt><dd class="mono" th:text="${ticket.plate}">ABC123</dd></div>
+                    <div class="receipt__row"><dt>Tipo de vehículo</dt><dd th:text="${ticket.vehicleType.visualName}">Carro</dd></div>
+                    <div class="receipt__row"><dt>Cupo asignado</dt><dd class="mono" th:text="${slot != null} ? ${slot.code} : '-'">A1</dd></div>
+                    <div class="receipt__row"><dt>Fecha y hora de entrada</dt><dd class="mono" th:text="${#temporals.format(ticket.entryAt, 'dd/MM/yyyy HH:mm')}">22/11/2026 08:00</dd></div>
+                    <div class="receipt__row" th:if="${ticket.exitAt != null}"><dt>Fecha y hora de salida</dt><dd class="mono" th:text="${#temporals.format(ticket.exitAt, 'dd/MM/yyyy HH:mm')}">22/11/2026 10:00</dd></div>
+                    <div class="receipt__row" th:if="${stay != null}"><dt>Tiempo de permanencia</dt><dd><span th:text="${stay}">2 h</span> (<span th:text="${billedHours}">2</span> <span th:text="${billedHours == 1} ? 'hora facturada' : 'horas facturadas'">horas facturadas</span>)</dd></div>
+                    <div class="receipt__row" th:if="${hourlyRate != null}"><dt>Tarifa por hora</dt><dd class="mono"><span th:replace="~{fragments/layout :: money(${hourlyRate})}">$ 4.500 COP</span></dd></div>
+                </dl>
+
+                <div class="receipt__total" th:if="${ticket.totalAmount != null}">
+                    <div><strong>Total cobrado</strong><br><span class="small">Cobro por hora o fracción</span></div>
+                    <strong><span th:replace="~{fragments/layout :: money(${ticket.totalAmount})}">$ 0 COP</span></strong>
+                </div>
+                <div class="alert alert--info" th:if="${ticket.open}">
+                    <span class="icon" aria-hidden="true">schedule</span>
+                    <div><strong>Vehículo actualmente dentro del parqueadero</strong><br>
+                        <span class="small">El valor total se calcula al registrar la salida.</span></div>
+                </div>
+
+                <footer class="receipt__foot no-print">
+                    <a class="btn btn--secondary" th:href="@{/tickets}"><span class="icon" aria-hidden="true">arrow_back</span>Volver a tickets</a>
+                    <a class="btn" th:unless="${ticket.open}" th:href="@{/tickets/{id}/receipt.pdf(id=${ticket.id})}"><span class="icon" aria-hidden="true">picture_as_pdf</span>Descargar PDF</a>
+                </footer>
+            </article>
+        </main>
     </div>
-</main>
+</div>
 </body>
 </html>

@@ -1,70 +1,111 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Cupos')}"></head>
+<head th:replace="~{fragments/layout :: head('Mapa de cupos')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main>
-    <div th:replace="~{fragments/layout :: messages}"></div>
-    <div class="lot">
-        <div>
-            <section class="zone" aria-labelledby="cars-title">
-                <div class="zone-head">
-                    <h2 id="cars-title">Carros</h2>
-                    <p><span th:text="${freeCars}">0</span> libres de <span th:text="${carBays.size()}">0</span></p>
-                </div>
-                <div class="bays">
-                    <div class="bay" th:each="b : ${carBays}" th:classappend="${b.busy} ? 'busy'">
-                        <span class="bay-code" th:text="${b.slot.code}">A1</span>
-                        <th:block th:if="${b.busy}">
-                            <span class="bay-plate" th:text="${b.ticket.plate}">ABC123</span>
-                            <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
-                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" th:method="put">
-                                <button class="compact" type="submit">Registrar salida</button>
-                            </form>
-                        </th:block>
-                        <span class="bay-state" th:unless="${b.busy}">Libre</span>
-                    </div>
-                </div>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('mapa')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Mapa de cupos', 'Control de ocupación del parqueadero')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+
+            <section class="stats" aria-label="Resumen operativo">
+                <div class="stat"><span>Total de cupos</span><strong th:text="${totalSlots}">50</strong></div>
+                <div class="stat stat--success"><span>Cupos disponibles</span><strong th:text="${freeSlots}">30</strong></div>
+                <div class="stat stat--primary"><span>Cupos ocupados</span><strong th:text="${busySlots}">20</strong></div>
+                <div class="stat"><span>Ocupación</span><strong th:text="${occupancyPercent} + '%'">40%</strong></div>
             </section>
 
-            <section class="zone" aria-labelledby="moto-title">
-                <div class="zone-head">
-                    <h2 id="moto-title">Motos</h2>
-                    <p><span th:text="${freeMotorcycles}">0</span> libres de <span th:text="${motorcycleBays.size()}">0</span></p>
-                </div>
-                <div class="bays motorcycle">
-                    <div class="bay" th:each="b : ${motorcycleBays}" th:classappend="${b.busy} ? 'busy'">
-                        <span class="bay-code" th:text="${b.slot.code}">M1</span>
-                        <th:block th:if="${b.busy}">
-                            <span class="bay-plate" th:text="${b.ticket.plate}">MOT45A</span>
-                            <span class="bay-since">desde <span th:text="${#temporals.format(b.ticket.entryAt, 'HH:mm')}">08:00</span></span>
-                            <form th:action="@{/tickets/{id}/check-out(id=${b.ticket.id})}" th:method="put">
-                                <button class="compact" type="submit">Registrar salida</button>
-                            </form>
-                        </th:block>
-                        <span class="bay-state" th:unless="${b.busy}">Libre</span>
+            <div class="control-center">
+                <section class="card" aria-label="Mapa del parqueadero">
+                    <div class="card__head">
+                        <div>
+                            <h2>Plano del parqueadero</h2>
+                            <p>Elige un cupo para ver su detalle o registrar la salida.</p>
+                        </div>
+                        <div class="btn-row">
+                            <span class="badge badge--free">Disponible</span>
+                            <span class="badge badge--busy">Ocupado</span>
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
 
-        <aside class="panel entry" id="entrada" aria-labelledby="entry-title">
-            <h2 id="entry-title">Registrar entrada</h2>
-            <form th:action="@{/tickets}" method="post">
-                <div class="field">
-                    <label for="plate">Placa</label>
-                    <input id="plate" name="plate" maxlength="6" placeholder="ABC123" autocomplete="off" aria-describedby="plate-help" required>
-                    <p class="hint" id="plate-help">Carro: 3 letras y 3 números (ABC123).<br>Moto: 3 letras, 2 números y 1 letra (ABC12D).</p>
-                </div>
-                <fieldset class="kinds">
-                    <legend>Tipo de vehículo</legend>
-                    <label><input type="radio" name="vehicleType" value="CAR" checked><span>Carro</span></label>
-                    <label><input type="radio" name="vehicleType" value="MOTORCYCLE"><span>Moto</span></label>
-                </fieldset>
-                <button type="submit">Registrar entrada</button>
-            </form>
-        </aside>
+                    <th:block th:replace="~{fragments/bays :: zone('Carros', 'ENTRADA CARROS', ${carBays}, ${freeCars}, ${selected})}"></th:block>
+                    <th:block th:replace="~{fragments/bays :: zone('Motos', 'ACCESO MOTOS', ${motorcycleBays}, ${freeMotorcycles}, ${selected})}"></th:block>
+                </section>
+
+                <aside class="aside-stack">
+                    <section class="card" aria-label="Registrar entrada de vehículo">
+                        <div class="card__head">
+                            <div>
+                                <h2>Registrar entrada</h2>
+                                <p>Se asigna el primer cupo libre.</p>
+                            </div>
+                        </div>
+                        <form class="form" th:action="@{/tickets}" method="post">
+                            <fieldset class="field choice-group">
+                                <legend>Tipo de vehículo</legend>
+                                <label class="choice"><input type="radio" name="vehicleType" value="CAR" checked><span>Carro</span></label>
+                                <label class="choice"><input type="radio" name="vehicleType" value="MOTORCYCLE"><span>Moto</span></label>
+                            </fieldset>
+                            <label class="field">
+                                <span>Placa del vehículo</span>
+                                <input class="mono" name="plate" maxlength="6" placeholder="ABC123" required autocomplete="off">
+                                <small>Carro: 3 letras y 3 números (ABC123). Moto: 3 letras, 2 números y 1 letra (ABC12D).</small>
+                            </label>
+                            <button class="btn btn--block" type="submit"><span class="icon" aria-hidden="true">login</span>Registrar entrada</button>
+                        </form>
+                    </section>
+
+                    <section class="card" aria-label="Detalle del cupo seleccionado">
+                        <div class="card__head">
+                            <h2>Detalle del cupo</h2>
+                            <span class="badge mono" th:if="${selected != null}" th:text="${selected.slot.code}">A1</span>
+                        </div>
+                        <p class="muted" th:if="${selected == null}">Selecciona un cupo del plano para ver su estado.</p>
+                        <div th:if="${selected != null and selected.busy}" class="form">
+                            <div class="facts">
+                                <div class="fact"><span>Placa</span><strong class="mono" th:text="${selected.ticket.plate}">ABC123</strong></div>
+                                <div class="fact"><span>Tipo de vehículo</span><strong th:text="${selected.slot.vehicleType.visualName}">Carro</strong></div>
+                                <div class="fact"><span>Hora de entrada</span><strong class="mono" th:text="${#temporals.format(selected.ticket.entryAt, 'HH:mm')}">08:00</strong></div>
+                                <div class="fact"><span>Tiempo dentro</span><strong th:text="${stay}">1 h</strong></div>
+                            </div>
+                            <a class="btn btn--block" th:href="@{/(slot=${selected.slot.code}, confirmar='')}"><span class="icon" aria-hidden="true">logout</span>Registrar salida</a>
+                        </div>
+                        <div th:if="${selected != null and !selected.busy}" class="alert alert--info">
+                            <span class="icon" aria-hidden="true">check_circle</span>
+                            <div><strong>Estado: libre</strong><br><span class="small">Listo para recibir un <span th:text="${#strings.toLowerCase(selected.slot.vehicleType.visualName)}">carro</span>.</span></div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </main>
     </div>
-</main>
+</div>
+
+<!-- Confirmación de salida: la dibuja el servidor cuando la dirección trae ?slot=A1&confirmar -->
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="exit-title" th:if="${confirmExit}">
+    <a class="modal__backdrop" th:href="@{/(slot=${selected.slot.code})}" aria-label="Cerrar"></a>
+    <div class="modal__panel">
+        <div class="modal__head">
+            <div>
+                <h2 id="exit-title">Confirmar salida del vehículo</h2>
+                <p class="muted">Verifica los datos antes de liberar el cupo.</p>
+            </div>
+            <a class="btn btn--secondary btn--sm" th:href="@{/(slot=${selected.slot.code})}" aria-label="Cerrar"><span class="icon sm" aria-hidden="true">close</span></a>
+        </div>
+        <div class="facts">
+            <div class="fact"><span>Placa</span><strong class="mono" th:text="${selected.ticket.plate}">ABC123</strong></div>
+            <div class="fact"><span>Tipo</span><strong th:text="${selected.slot.vehicleType.visualName}">Carro</strong></div>
+            <div class="fact"><span>Cupo</span><strong class="mono" th:text="${selected.slot.code}">A1</strong></div>
+            <div class="fact"><span>Entrada</span><strong class="mono" th:text="${#temporals.format(selected.ticket.entryAt, 'dd/MM/yyyy HH:mm')}">22/11/2026 08:00</strong></div>
+            <div class="fact"><span>Tiempo dentro</span><strong th:text="${stay}">1 h</strong></div>
+        </div>
+        <p class="muted small">El valor a cobrar se calcula al confirmar: cada hora o fracción se cobra como hora completa.</p>
+        <form th:action="@{/tickets/{id}/check-out(id=${selected.ticket.id})}" th:method="put" class="btn-row">
+            <a class="btn btn--secondary" th:href="@{/(slot=${selected.slot.code})}">Cancelar</a>
+            <button class="btn" type="submit">Confirmar salida</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

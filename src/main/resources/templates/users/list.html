@@ -2,59 +2,85 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Usuarios')}"></head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
-<main class="stack">
-    <h1>Usuarios</h1>
-    <div th:replace="~{fragments/layout :: messages}"></div>
-    <section class="panel" aria-labelledby="new-user">
-        <h2 id="new-user">Crear usuario</h2>
-        <form class="inline-form" th:action="@{/users}" th:object="${form}" method="post">
-            <div class="field">
-                <label for="username">Usuario</label>
-                <input id="username" th:field="*{username}" maxlength="30" placeholder="operador2" required>
+<div class="app-shell">
+    <th:block th:replace="~{fragments/layout :: sidebar('users')}"></th:block>
+    <div class="workspace">
+        <header th:replace="~{fragments/layout :: topbar('Gestión de usuarios', 'Operadores y administradores del sistema')}"></header>
+        <main class="page">
+            <th:block th:replace="~{fragments/layout :: messages}"></th:block>
+
+            <section class="stats" aria-label="Resumen de usuarios">
+                <div class="stat"><span>Total de usuarios</span><strong th:text="${totalUsers}">4</strong></div>
+                <div class="stat"><span>Administradores</span><strong th:text="${admins}">1</strong></div>
+                <div class="stat"><span>Operadores</span><strong th:text="${operators}">3</strong></div>
+            </section>
+
+            <div class="toolbar">
+                <p class="muted">No puedes eliminar tu propia cuenta ni dejar el sistema sin administradores.</p>
+                <a class="btn" th:href="@{/users(crear)}"><span class="icon" aria-hidden="true">person_add</span>Crear usuario</a>
             </div>
-            <div class="field">
-                <label for="password">Contraseña (mínimo 6)</label>
-                <input id="password" th:field="*{password}" type="password" minlength="6" autocomplete="new-password" required>
-            </div>
-            <div class="field">
-                <label for="role">Rol</label>
-                <select id="role" th:field="*{role}">
-                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r.visualName}"></option>
-                </select>
-            </div>
-            <button type="submit">Crear usuario</button>
-        </form>
-    </section>
-    <p>Para cambiar la contraseña, escriba una nueva; si la deja vacía se conserva la actual. No se puede eliminar la propia cuenta ni dejar el sistema sin administradores.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Usuario</th><th>Editar rol y contraseña</th><th>Eliminar</th></tr></thead>
-            <tbody>
-            <tr th:each="u : ${users}">
-                <td><strong th:text="${u.username}"></strong>
-                    <span th:if="${u.username == currentUsername}"> (usted)</span></td>
-                <td>
-                    <form class="inline-form" th:action="@{/users/{id}(id=${u.id})}" th:method="put">
-                        <select name="role" th:aria-label="'Rol de ' + ${u.username}">
-                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r.visualName}"
-                                    th:selected="${r == u.role}"></option>
-                        </select>
-                        <input name="password" type="password" minlength="6" placeholder="Nueva contraseña (opcional)"
-                               autocomplete="new-password" th:aria-label="'Nueva contraseña de ' + ${u.username}">
-                        <button type="submit" class="compact">Guardar</button>
-                    </form>
-                </td>
-                <td>
-                    <form th:action="@{/users/{id}(id=${u.id})}" th:method="delete"
-                          th:attr="onsubmit=|return confirm('¿Eliminar al usuario ${u.username}?')|">
-                        <button type="submit" class="compact danger" th:disabled="${u.username == currentUsername}">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+            <section class="card card--flush" aria-label="Tabla de usuarios">
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr><th scope="col">Nombre de usuario</th><th scope="col">Rol</th><th scope="col" class="actions">Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${users}">
+                            <td><strong th:text="${u.username}">usuario</strong> <span class="muted small" th:if="${u.username == currentUsername}">(tú)</span></td>
+                            <td><span class="badge badge--role" th:text="${u.role.visualName}">Operador</span></td>
+                            <td class="actions">
+                                <div class="btn-row btn-row--end">
+                                    <a class="btn btn--secondary btn--sm" th:href="@{/users(editar=${u.id})}">Editar</a>
+                                    <form th:action="@{/users/{id}(id=${u.id})}" th:method="delete">
+                                        <button class="btn btn--danger btn--sm" type="submit" th:disabled="${u.username == currentUsername}">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-</main>
+</div>
+
+<!-- Ventana para crear o editar un usuario: la dibuja el servidor con ?crear o ?editar=<id> -->
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="user-title" th:if="${showCreate or editing != null}">
+    <a class="modal__backdrop" th:href="@{/users}" aria-label="Cerrar"></a>
+    <div class="modal__panel">
+        <div class="modal__head">
+            <h2 id="user-title" th:text="${editing != null} ? 'Editar usuario' : 'Crear usuario'">Crear usuario</h2>
+            <a class="btn btn--secondary btn--sm" th:href="@{/users}" aria-label="Cerrar"><span class="icon sm" aria-hidden="true">close</span></a>
+        </div>
+        <form class="form" th:action="${editing != null} ? @{/users/{id}(id=${editing.id})} : @{/users}" th:method="${editing != null} ? 'put' : 'post'">
+            <label class="field" th:if="${editing == null}">
+                <span>Nombre de usuario</span>
+                <input name="username" maxlength="30" required placeholder="jgomez" autocomplete="off" autofocus>
+            </label>
+            <p th:if="${editing != null}">Usuario: <strong th:text="${editing.username}">usuario</strong></p>
+            <label class="field">
+                <span>Rol</span>
+                <select name="role">
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r.visualName}" th:selected="${editing != null ? editing.role == r : r.name() == 'OPERATOR'}"></option>
+                </select>
+            </label>
+            <label class="field">
+                <span th:text="${editing != null} ? 'Nueva contraseña (opcional, mínimo 6 caracteres)' : 'Contraseña (mínimo 6 caracteres)'">Contraseña</span>
+                <input type="password" name="password" minlength="6" autocomplete="new-password" th:required="${editing == null}">
+            </label>
+            <label class="field">
+                <span>Confirmar contraseña</span>
+                <input type="password" name="confirmPassword" minlength="6" autocomplete="new-password" th:required="${editing == null}">
+            </label>
+            <div class="btn-row">
+                <a class="btn btn--secondary" th:href="@{/users}">Cancelar</a>
+                <button class="btn" type="submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

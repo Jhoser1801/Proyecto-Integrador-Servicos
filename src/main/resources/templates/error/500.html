@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Algo falló de nuestro lado')}"></head>
-<body>
-<main class="center-screen">
-    <div class="sign">
-        <p class="sign-big">500</p>
-        <h1>Algo falló de nuestro lado</h1>
-        <p>No pudimos completar la acción. Intenta de nuevo en un momento.</p>
-        <p th:if="${message}" th:text="${message}"></p>
-        <a class="btn" th:href="@{/}">Volver a los cupos</a>
-    </div>
-</main>
+<head th:replace="~{fragments/layout :: head('Error interno')}"></head>
+<body class="public">
+<header th:replace="~{fragments/layout :: publicbar('Sistema de gestión de parqueaderos')}"></header>
+<main th:replace="~{fragments/layout :: errorpage('500', 'Error interno', 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.')}"></main>
 </body>
 </html>

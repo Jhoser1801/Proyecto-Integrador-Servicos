@@ -7,6 +7,7 @@ import dev.brice.parking.core.constant.VehicleType;
 import dev.brice.parking.core.dto.CheckInDTO;
 import dev.brice.parking.core.dto.ReceiptDTO;
 import dev.brice.parking.core.dto.ReportDataDTO;
+import dev.brice.parking.core.dto.RevenueSummaryDTO;
 import dev.brice.parking.core.dto.SlotDTO;
 import dev.brice.parking.core.dto.TariffDTO;
 import dev.brice.parking.core.entity.ParkingTicket;
@@ -65,6 +66,36 @@ class ReportServiceTest {
 
         assertTrue(report.tickets().isEmpty());
         assertEquals(BigDecimal.ZERO, report.totalRevenue());
+    }
+
+    @Test
+    void revenueSummaryGroupsByDayAndType() {
+        ParkingTicket first = parking.checkIn(new CheckInDTO("ABC123", VehicleType.CAR));
+        clock.advanceMinutes(60);
+        parking.checkOut(first.id());            // 3.000 el 10/11
+        clock.advanceMinutes(24 * 60);
+        ParkingTicket second = parking.checkIn(new CheckInDTO("XYZ987", VehicleType.CAR));
+        clock.advanceMinutes(150);
+        parking.checkOut(second.id());           // 9.000 el 11/11
+
+        RevenueSummaryDTO summary = reports.buildRevenueSummary(LocalDate.of(2026, 11, 9), LocalDate.of(2026, 11, 11));
+
+        assertEquals(new BigDecimal("12000"), summary.total());
+        assertEquals(2, summary.vehicles());
+        assertEquals(new BigDecimal("12000"), summary.carsRevenue());
+        assertEquals(BigDecimal.ZERO, summary.motorcyclesRevenue());
+        assertEquals(100.0, summary.carsPercent());
+        assertEquals(3, summary.days().size());                    // incluye el 09/11 sin ingresos
+        assertEquals(0, summary.days().get(0).percentOfMax());
+        assertEquals(33, summary.days().get(1).percentOfMax());    // 3.000 de 9.000
+        assertEquals(100, summary.days().get(2).percentOfMax());
+        assertEquals(new BigDecimal("4000"), summary.dailyAverage());
+    }
+
+    @Test
+    void revenueSummaryRejectsTooLongRange() {
+        assertThrows(IllegalArgumentException.class,
+                () -> reports.buildRevenueSummary(LocalDate.of(2024, 1, 1), LocalDate.of(2026, 11, 11)));
     }
 
     @Test

@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('No se pudo leer la solicitud')}"></head>
-<body>
-<main class="center-screen">
-    <div class="sign">
-        <p class="sign-big">400</p>
-        <h1>No se pudo leer la solicitud</h1>
-        <p>Hay un dato incorrecto.</p>
-        <p th:if="${message}" th:text="${message}"></p>
-        <a class="btn" th:href="@{/}">Volver a los cupos</a>
-    </div>
-</main>
+<head th:replace="~{fragments/layout :: head('Solicitud incorrecta')}"></head>
+<body class="public">
+<header th:replace="~{fragments/layout :: publicbar('Sistema de gestión de parqueaderos')}"></header>
+<main th:replace="~{fragments/layout :: errorpage('400', 'Solicitud incorrecta', 'No se pudo entender lo que se envió. Revisa los datos e inténtalo de nuevo.')}"></main>
 </body>
 </html>

@@ -1,40 +1,114 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!--
+  Piezas compartidas por todas las pantallas:
+  head(title)              <head> con fuentes y la hoja de estilos
+  sidebar(active)          barra lateral (active = mapa | tickets | slots | tariffs | users | reports)
+  topbar(title, subtitle)  encabezado con fecha y rol
+  messages                 avisos de exito o error (flash)
+  money(amount)            valor en pesos colombianos
+  publicbar(note)          barra de las paginas publicas
+  errorpage(...)           pagina de error
+-->
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title} + ' - Parqueadero'">Parqueadero</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Semi+Condensed:wght@700;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alata&amp;family=Instrument+Sans:wght@400;500;600;700&amp;family=Red+Hat+Mono:wght@500;600&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block">
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<header class="topbar" th:fragment="nav">
-    <div class="topbar-inner">
-        <a class="logo" th:href="@{/}"><span class="logo-p" aria-hidden="true">P</span>Parqueadero</a>
-        <nav aria-label="Principal">
-            <a th:href="@{/}">Cupos</a>
-            <a th:href="@{/tickets}">Tickets</a>
-            <a th:href="@{/tariffs}" sec:authorize="hasRole('ADMIN')">Tarifas</a>
-            <a th:href="@{/slots}" sec:authorize="hasRole('ADMIN')">Administrar cupos</a>
-            <a th:href="@{/users}" sec:authorize="hasRole('ADMIN')">Usuarios</a>
-            <a th:href="@{/reports}" sec:authorize="hasRole('ADMIN')">Reportes</a>
-        </nav>
-        <div class="who">
-            <span><span sec:authentication="name">usuario</span></span>
-            <form th:action="@{/logout}" method="post"><button class="compact" type="submit">Salir</button></form>
+
+<th:block th:fragment="sidebar(active)">
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Abrir el menú">
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar__brand">
+                <span class="sidebar__logo" aria-hidden="true">P</span>
+                <div>
+                    <span class="sidebar__name">Parqueadero</span>
+                    <span class="sidebar__tagline">Control vehicular</span>
+                </div>
+            </div>
+            <nav class="sidebar__nav" aria-label="Navegación principal">
+                <span class="sidebar__group">Operación</span>
+                <a class="sidebar__link" th:classappend="${active == 'mapa'} ? 'is-active'" th:attr="aria-current=${active == 'mapa'} ? 'page'" th:href="@{/}">
+                    <span class="icon" aria-hidden="true">local_parking</span><span>Mapa de cupos</span></a>
+                <a class="sidebar__link" th:classappend="${active == 'tickets'} ? 'is-active'" th:attr="aria-current=${active == 'tickets'} ? 'page'" th:href="@{/tickets}">
+                    <span class="icon" aria-hidden="true">receipt_long</span><span>Tickets</span></a>
+                <th:block sec:authorize="hasRole('ADMIN')">
+                    <span class="sidebar__group">Administración</span>
+                    <a class="sidebar__link" th:classappend="${active == 'slots'} ? 'is-active'" th:attr="aria-current=${active == 'slots'} ? 'page'" th:href="@{/slots}">
+                        <span class="icon" aria-hidden="true">grid_view</span><span>Administrar cupos</span></a>
+                    <a class="sidebar__link" th:classappend="${active == 'tariffs'} ? 'is-active'" th:attr="aria-current=${active == 'tariffs'} ? 'page'" th:href="@{/tariffs}">
+                        <span class="icon" aria-hidden="true">payments</span><span>Tarifas</span></a>
+                    <a class="sidebar__link" th:classappend="${active == 'users'} ? 'is-active'" th:attr="aria-current=${active == 'users'} ? 'page'" th:href="@{/users}">
+                        <span class="icon" aria-hidden="true">group</span><span>Usuarios</span></a>
+                    <a class="sidebar__link" th:classappend="${active == 'reports'} ? 'is-active'" th:attr="aria-current=${active == 'reports'} ? 'page'" th:href="@{/reports}">
+                        <span class="icon" aria-hidden="true">bar_chart</span><span>Reportes</span></a>
+                </th:block>
+            </nav>
+        </div>
+        <div class="sidebar__user">
+            <div class="sidebar__who">
+                <span class="avatar" th:text="${#strings.toUpperCase(#strings.substring(#authentication.name, 0, 1))}">A</span>
+                <div>
+                    <strong sec:authentication="name">usuario</strong>
+                    <small sec:authorize="hasRole('ADMIN')">Administrador</small>
+                    <small sec:authorize="!hasRole('ADMIN')">Operador</small>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn--ghost btn--block" type="submit"><span class="icon sm" aria-hidden="true">logout</span>Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+</th:block>
+
+<header class="topbar" th:fragment="topbar(title, subtitle)">
+    <div class="topbar__title">
+        <label for="nav-toggle" class="menu-btn" aria-label="Abrir el menú"><span class="icon" aria-hidden="true">menu</span></label>
+        <div>
+            <h1 th:text="${title}">Título</h1>
+            <p th:text="${subtitle}">Descripción</p>
+        </div>
+    </div>
+    <div class="topbar__tools">
+        <span class="badge"><span class="icon sm" aria-hidden="true">calendar_today</span>
+            <span class="mono" th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')} + ' | ' + ${#temporals.format(#temporals.createNow(), 'HH:mm')}">22/11/2026 | 08:00</span></span>
+        <span class="badge badge--role"><span class="icon sm" aria-hidden="true">verified_user</span>
+            <span sec:authorize="hasRole('ADMIN')">Administrador</span><span sec:authorize="!hasRole('ADMIN')">Operador</span></span>
+    </div>
+</header>
+
+<th:block th:fragment="messages">
+    <div class="alert alert--success" role="status" th:if="${success}"><span class="icon" aria-hidden="true">check_circle</span><span th:text="${success}"></span></div>
+    <div class="alert alert--error" role="alert" th:if="${error}"><span class="icon" aria-hidden="true">warning</span><span th:text="${error}"></span></div>
+</th:block>
+
+<span th:fragment="money(amount)" th:text="'$ ' + ${#numbers.formatDecimal(amount, 1, 'POINT', 0, 'COMMA')} + ' COP'">$ 4.500 COP</span>
+
+<header class="public__bar" th:fragment="publicbar(note)">
+    <div class="public__brand">
+        <span class="sidebar__logo" aria-hidden="true">P</span>
+        <div>
+            <span class="sidebar__name">Parqueadero</span>
+            <span class="sidebar__tagline" th:text="${note}">Información pública</span>
         </div>
     </div>
 </header>
-<header class="topbar" th:fragment="publicnav">
-    <div class="topbar-inner">
-        <a class="logo" th:href="@{/cupos}"><span class="logo-p" aria-hidden="true">P</span>Parqueadero</a>
-    </div>
-</header>
-<div th:fragment="messages">
-    <div class="notice success" role="status" th:if="${success}" th:text="${success}"></div>
-    <div class="notice error" role="alert" th:if="${error}" th:text="${error}"></div>
-</div>
+
+<main class="public__main" th:fragment="errorpage(code, title, text)">
+    <section class="card error-page">
+        <span class="error-page__code" th:text="${code}">404</span>
+        <h1 th:text="${title}">Título</h1>
+        <p class="muted" th:text="${text}">Texto</p>
+        <p class="muted" th:if="${message}" th:text="${message}"></p>
+        <a class="btn" th:href="@{/}"><span class="icon" aria-hidden="true">home</span>Volver al inicio</a>
+    </section>
+</main>
 </body>
 </html>
