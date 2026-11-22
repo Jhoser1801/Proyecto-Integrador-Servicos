@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <!--
-  Piezas compartidas por todas las pantallas:
-  head(title)              <head> con fuentes y la hoja de estilos
+  Piezas compartidas para todas las pantallas:
+  head(title)              <head>
   sidebar(active)          barra lateral (active = mapa | tickets | slots | tariffs | users | reports)
   topbar(title, subtitle)  encabezado con fecha y rol
   messages                 avisos de exito o error (flash)
-  money(amount)            valor en pesos colombianos
-  publicbar(note)          barra de las paginas publicas
-  errorpage(...)           pagina de error
+  money(amount)            valor en pesos colombianos COP
+  publicbar(note)          barra de las páginas públicas
+  errorpage(...)           página de error
 -->
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
