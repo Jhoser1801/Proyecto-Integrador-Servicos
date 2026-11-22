@@ -42,7 +42,6 @@ public class TicketController {
         this.tariffs = tariffs;
     }
 
-    // Filtros por GET (?q=ABC&type=CAR&status=OPEN&from=2026-11-01&to=2026-11-22): el servidor filtra, sin JavaScript
     @GetMapping
     public String list(@RequestParam(required = false) String q,
                        @RequestParam(required = false) VehicleType type,
@@ -76,7 +75,6 @@ public class TicketController {
         return "tickets/list";
     }
 
-    // El formulario de entrada vive en el inicio (mapa de cupos); aqui solo se recibe y se vuelve a ese inicio
     @PostMapping
     public String checkIn(@ModelAttribute CheckInDTO form, RedirectAttributes redirect) {
         try {

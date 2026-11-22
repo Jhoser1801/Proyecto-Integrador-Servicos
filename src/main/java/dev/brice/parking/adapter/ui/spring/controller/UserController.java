@@ -21,7 +21,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
-// Solo el administrador (ver SecurityConfig): crear, actualizar y eliminar operadores y administradores
+// Solo el administrador: crear, actualizar y eliminar operadores y administradores
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -31,7 +31,6 @@ public class UserController {
         this.users = users;
     }
 
-    // ?crear abre la ventana de usuario nuevo y ?editar=<id> la de edicion (la dibuja el servidor, sin JavaScript)
     @GetMapping
     public String list(@RequestParam(required = false) String crear,
                        @RequestParam(required = false) UUID editar, Model model, Principal principal) {
@@ -60,7 +59,7 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // PUT: cambia el rol y, si se escribe una contrasena nueva, tambien la contrasena
+    // PUT: cambia el rol y, si se escribe una contraseña nueva, tambien la contraseña
     @PutMapping("/{id}")
     public String update(@PathVariable UUID id, @ModelAttribute UserUpdateDTO form,
                          @RequestParam(defaultValue = "") String confirmPassword, RedirectAttributes redirect) {

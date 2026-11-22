@@ -21,7 +21,6 @@ public class ReportController {
         this.reports = reports;
     }
 
-    // Por defecto muestra los ultimos 7 dias; el rango se cambia con ?from=yyyy-MM-dd&to=yyyy-MM-dd
     @GetMapping
     public String report(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,

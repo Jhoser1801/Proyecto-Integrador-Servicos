@@ -19,11 +19,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/css/**", "/error", "/error/**", "/cupos").permitAll()
-                        // consola web de H2: solo el administrador (y H2 solo acepta conexiones de este equipo)
+                        // consola web de H2: solo el administrador
                         .requestMatchers("/h2/**").hasRole(UserRole.ADMIN.name())
                         .requestMatchers("/slots/**", "/tariffs/**", "/reports/**", "/users/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().authenticated())
-                // la consola de H2 usa formularios sin token CSRF y marcos (frames) de la misma pagina
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2/**"))
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
@@ -31,7 +30,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // BCrypt de Spring Security: valida el login (genera hashes compatibles con BCryptPasswordHasher)
+    // BCrypt de Spring Security: valida el login
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

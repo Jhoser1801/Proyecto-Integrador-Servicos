@@ -29,7 +29,6 @@ public class SlotController {
         this.slots = slots;
     }
 
-    // ?crear abre la ventana de cupo nuevo y ?editar=<id> la de edicion (la dibuja el servidor, sin JavaScript)
     @GetMapping
     public String list(@RequestParam(required = false) String crear,
                        @RequestParam(required = false) UUID editar, Model model) {

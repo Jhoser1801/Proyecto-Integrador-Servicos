@@ -9,7 +9,6 @@ import dev.brice.parking.core.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// Entrega a Spring los objetos del core que ya se crearon en Application (los mismos que usa Javalin)
 @Configuration
 public class SpringConfig {
     public static UserService userService;

@@ -31,7 +31,7 @@ public class DashboardController {
         this.parking = parking;
     }
 
-    // Un cupo junto al ticket abierto que lo ocupa (si lo hay): es lo que dibuja el mapa de cupos
+    // Un cupo junto al ticket abierto que lo ocupa (si lo hay)
     public record Bay(ParkingSlot slot, ParkingTicket ticket) {
         public boolean busy() {
             return ticket != null;
@@ -42,7 +42,7 @@ public class DashboardController {
     public String dashboard(@RequestParam(required = false) String slot,
                             @RequestParam(required = false) String confirmar,
                             Model model, Authentication authentication) {
-        // Sin sesion, la raiz muestra la pagina publica: el login no tiene boton, se entra escribiendo /login
+        // Sin sesion, la raiz muestra la pagina publica
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "redirect:/cupos";
         }
@@ -64,7 +64,6 @@ public class DashboardController {
         model.addAttribute("busySlots", bays.size() - free);
         model.addAttribute("occupancyPercent", bays.isEmpty() ? 0 : (bays.size() - free) * 100 / bays.size());
 
-        // El cupo elegido en el mapa llega como ?slot=A1 (sin JavaScript: cada cupo es un enlace)
         Bay selected = slot == null ? null : bays.stream()
                 .filter(b -> b.slot().code().equalsIgnoreCase(slot.trim())).findFirst().orElse(null);
         model.addAttribute("selected", selected);

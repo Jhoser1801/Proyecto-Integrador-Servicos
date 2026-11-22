@@ -29,7 +29,7 @@ public class TariffController {
         return "tariffs/list";
     }
 
-    // PUT: actualiza la tarifa de un tipo de vehiculo (el formulario envia _method=put)
+    // PUT: actualiza la tarifa de un tipo de vehiculo
     @PutMapping("/{vehicleType}")
     public String update(@PathVariable VehicleType vehicleType,
                          @RequestParam BigDecimal hourlyRate,

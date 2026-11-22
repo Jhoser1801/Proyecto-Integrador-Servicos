@@ -29,8 +29,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
-// Adaptador de interfaz REST (Javalin). Solo traduce HTTP <-> casos de uso; las reglas viven en core.
-// Autenticacion: HTTP Basic con los mismos usuarios de las vistas.
+// Adaptador de interfaz REST (Javalin). Solo traduce HTTP <-> casos de uso
+
 public class JavalinUI {
     private static final String USER_ATTRIBUTE = "user";
 
@@ -39,7 +39,7 @@ public class JavalinUI {
     private final TariffService tariffs;
     private final ReportService reports;
     private final UserService users;
-    // JsonMapper.builder() es la forma actual de configurar Jackson (ObjectMapper.disable(MapperFeature) esta obsoleto)
+
     private final ObjectMapper json = JsonMapper.builder()
             .addModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -76,7 +76,6 @@ public class JavalinUI {
                 ctx.status(HttpStatus.NO_CONTENT);
             });
 
-            // usuarios (solo ADMIN). La respuesta nunca incluye la contrasena ni su hash
             config.routes.get("/api/users", ctx -> {
                 requireAdmin(ctx);
                 respond(ctx, users.findAllUsers().stream().map(this::publicView).toList());

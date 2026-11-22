@@ -3,7 +3,7 @@ package dev.brice.parking.adapter.security;
 import dev.brice.parking.core.port.PasswordHasher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-// Implementa el puerto con el BCrypt de Spring Security (el core no conoce Spring)
+// Implementa el puerto con el BCrypt de Spring Security
 public class BCryptPasswordHasher implements PasswordHasher {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
