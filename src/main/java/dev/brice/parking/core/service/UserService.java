@@ -71,7 +71,7 @@ public class UserService {
         return updated;
     }
 
-    // actingUsername es quien hace la peticion: nadie puede eliminar su propia cuenta
+    // nadie puede eliminar su propia cuenta
     public void deleteUser(UUID id, String actingUsername) {
         User user = findExistingUser(id);
         if (user.username().equalsIgnoreCase(actingUsername)) {
