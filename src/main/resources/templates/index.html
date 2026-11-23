@@ -41,7 +41,7 @@
                                 <p>Se asigna el primer cupo libre.</p>
                             </div>
                         </div>
-                        <form class="form" th:action="@{/tickets}" method="post">
+                        <form class="form entry-form" th:action="@{/tickets}" method="post">
                             <fieldset class="field choice-group">
                                 <legend>Tipo de vehículo</legend>
                                 <label class="choice"><input type="radio" name="vehicleType" value="CAR" checked><span>Carro</span></label>
@@ -49,8 +49,9 @@
                             </fieldset>
                             <label class="field">
                                 <span>Placa del vehículo</span>
-                                <input class="mono" name="plate" maxlength="6" placeholder="ABC123" required autocomplete="off">
-                                <small>Carro: 3 letras y 3 números (ABC123). Moto: 3 letras, 2 números y 1 letra (ABC12D).</small>
+                                <input class="mono" name="plate" maxlength="6" placeholder="Escribe la placa" required autocomplete="off">
+                                <small class="plate-hint plate-hint--car">Placa de carro: 3 letras y 3 números. Ejemplo: ABC123</small>
+                                <small class="plate-hint plate-hint--moto">Placa de moto: 3 letras, 2 números y 1 letra. Ejemplo: ABC12D</small>
                             </label>
                             <button class="btn btn--block" type="submit"><span class="icon" aria-hidden="true">login</span>Registrar entrada</button>
                         </form>

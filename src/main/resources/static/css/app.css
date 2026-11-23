@@ -225,6 +225,9 @@ button, input, select { font: inherit; color: inherit; }
         font-family: var(--font-mono); font-size: 11px; }
 .lane::before, .lane::after { content: ""; flex: 1; border-top: 2px dashed var(--outline); opacity: 0.6; }
 .aside-stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.plate-hint--moto { display: none; }
+.entry-form:has(input[value="MOTORCYCLE"]:checked) .plate-hint--car { display: none; }
+.entry-form:has(input[value="MOTORCYCLE"]:checked) .plate-hint--moto { display: block; }
 
 /* historial: filtros */
 .filters { display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3); }
