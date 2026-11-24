@@ -1,0 +1,131 @@
+classDiagram
+direction TB
+class SlotController {
+  <<controller>>
+}
+class PublicController {
+  <<controller>>
+}
+class DashboardController {
+  <<controller>>
+}
+class TicketController {
+  <<controller>>
+}
+class ReportController {
+  <<controller>>
+}
+class TariffController {
+  <<controller>>
+}
+class UserController {
+  <<controller>>
+}
+class JavalinUI {
+  <<REST adapter>>
+  +runServer(port) Javalin
+}
+class SlotService {
+  <<service>>
+  +createSlot(SlotDTO) ParkingSlot
+  +updateSlot(UUID, SlotDTO) ParkingSlot
+  +deleteSlot(UUID)
+}
+class ParkingService {
+  <<service>>
+  +checkIn(CheckInDTO) ParkingTicket
+  +checkOut(UUID) ParkingTicket
+  +searchTickets() List
+}
+class ReportService {
+  <<service>>
+  +buildRevenueSummary(from, to)
+  +buildReceipt(UUID) ReceiptDTO
+}
+class TariffService {
+  <<service>>
+  +setTariff(TariffDTO) Tariff
+  +findAllTariffs() List
+}
+class UserService {
+  <<service>>
+  +createUser(UserDTO) User
+  +updateUser(UUID, UserUpdateDTO) User
+  +authenticate(user, password) Optional
+}
+class TicketRepository {
+  <<interface>>
+  +saveTicket(ParkingTicket)
+  +findOpenTicketByPlate(String) Optional
+  +existsTicketBySlotId(UUID) boolean
+}
+class SlotRepository {
+  <<interface>>
+  +saveSlot(ParkingSlot)
+  +findFreeSlotsByType(VehicleType) List
+  +deleteSlotById(UUID)
+}
+class TariffRepository {
+  <<interface>>
+  +saveTariff(Tariff)
+  +findTariffByVehicleType(VehicleType) Optional
+}
+class UserRepository {
+  <<interface>>
+  +saveUser(User)
+  +findUserByUsername(String) Optional
+}
+class PasswordHasher {
+  <<interface>>
+  +hash(String) String
+  +matches(String, String) boolean
+}
+class H2TicketRepository {
+  <<adapter>>
+  -TicketDAO ticketDAO
+}
+class H2SlotRepository {
+  <<adapter>>
+  -SlotDAO slotDAO
+}
+class H2TariffRepository {
+  <<adapter>>
+  -TariffDAO tariffDAO
+}
+class H2UserRepository {
+  <<adapter>>
+  -UserDAO userDAO
+}
+class BCryptPasswordHasher {
+  <<adapter>>
+  -BCryptPasswordEncoder encoder
+}
+SlotController ..> SlotService
+PublicController ..> SlotService
+DashboardController ..> SlotService
+DashboardController ..> ParkingService
+TicketController ..> ParkingService
+TicketController ..> TariffService
+ReportController ..> ReportService
+TariffController ..> TariffService
+UserController ..> UserService
+JavalinUI ..> SlotService
+JavalinUI ..> ParkingService
+JavalinUI ..> ReportService
+JavalinUI ..> TariffService
+JavalinUI ..> UserService
+SlotService ..> SlotRepository
+SlotService ..> TicketRepository
+ParkingService ..> TicketRepository
+ParkingService ..> SlotRepository
+ParkingService ..> TariffRepository
+ReportService ..> TicketRepository
+ReportService ..> SlotRepository
+TariffService ..> TariffRepository
+UserService ..> UserRepository
+UserService ..> PasswordHasher
+TicketRepository <|.. H2TicketRepository
+SlotRepository <|.. H2SlotRepository
+TariffRepository <|.. H2TariffRepository
+UserRepository <|.. H2UserRepository
+PasswordHasher <|.. BCryptPasswordHasher

@@ -1,0 +1,29 @@
+erDiagram
+PARKING_SLOT {
+  uuid slot_id PK
+  varchar code UK
+  varchar vehicle_type
+  varchar status
+}
+PARKING_TICKET {
+  uuid ticket_id PK
+  varchar plate
+  varchar vehicle_type
+  uuid slot_id FK
+  timestamp entry_at
+  timestamp exit_at
+  decimal total_amount
+  varchar status
+}
+TARIFF {
+  uuid tariff_id PK
+  varchar vehicle_type UK
+  decimal hourly_rate
+}
+APP_USER {
+  uuid user_id PK
+  varchar username UK
+  varchar password_hash
+  varchar role
+}
+PARKING_SLOT ||--o{ PARKING_TICKET : "fk_ticket_slot"
